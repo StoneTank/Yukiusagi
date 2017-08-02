@@ -205,6 +205,11 @@
     <Content Include="HTML\moment.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\Fav.png" />
+    <None Include="Resources\FavActive.png" />
+    <None Include="Resources\FavRt.png" />
+    <None Include="Resources\FavRtActive.png" />
+    <None Include="Resources\Destroy.png" />
     <Content Include="Resources\Loading.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -222,6 +227,10 @@
     <Content Include="HTML\Timeline.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\Reply.png" />
+    <None Include="Resources\Rt.png" />
+    <None Include="Resources\RtActive.png" />
+    <None Include="Resources\Steal.png" />
     <Content Include="Yukiusagi.ico" />
   </ItemGroup>
   <ItemGroup>
