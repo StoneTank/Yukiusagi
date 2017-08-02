@@ -13,6 +13,7 @@ namespace StoneTank.Yukiusagi
         /// </summary>
         public JsFront JsFront { get; set; } = new JsFront();
 
+        // DockContent を区別するための文字列
         private string persistString;
 
         protected override string GetPersistString()
@@ -24,6 +25,8 @@ namespace StoneTank.Yukiusagi
         {
             InitializeComponent();
 
+            // DockContent を区別するための文字列
+            // "0:TimelineForm" の形式
             persistString = $"{Settings.Default.TabId}:{nameof(TimelineForm)}";
 
             if (Settings.Default.TabId == ulong.MaxValue)

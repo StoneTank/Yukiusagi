@@ -111,6 +111,7 @@ namespace StoneTank.Yukiusagi
                 {
                     dockPanel.LoadFromXml(stream, new DeserializeDockContent(new Func<string, IDockContent>(s =>
                     {
+                        // 文字列から該当する Form を見つけて返す
                         if (s.EndsWith(nameof(TimelineForm)))
                         {
                             return new TimelineForm();
@@ -122,8 +123,6 @@ namespace StoneTank.Yukiusagi
                     })));
                 }
             }
-
-            
         }
 
         private async void MainForm_Load(object sender, EventArgs e)
