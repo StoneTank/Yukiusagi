@@ -1,0 +1,39 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="StoneTank.Yukiusagi.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="StatusesCount" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="Font" Type="System.Drawing.Font" Scope="User">
+      <Value Profile="(Default)">Meiryo UI, 9pt</Value>
+    </Setting>
+    <Setting Name="PostShortcutKey" Type="System.Windows.Forms.Keys" Scope="User">
+      <Value Profile="(Default)">Shift+Enter</Value>
+    </Setting>
+    <Setting Name="WindowState" Type="System.Windows.Forms.FormWindowState" Scope="User">
+      <Value Profile="(Default)">Normal</Value>
+    </Setting>
+    <Setting Name="SplitterDistance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">72</Value>
+    </Setting>
+    <Setting Name="NotificationEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="WindowLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">100, 50</Value>
+    </Setting>
+    <Setting Name="IsUpgraded" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="WindowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">800, 600</Value>
+    </Setting>
+    <Setting Name="WindowLayout" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TabId" Type="System.UInt64" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
