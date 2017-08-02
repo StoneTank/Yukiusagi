@@ -87,43 +87,43 @@ namespace StoneTank.Yukiusagi
         }
 
         // Will be called from JavaScript
-        public void Favorite(int statusId, string callBackFunctionString)
+        public void Favorite(long statusId, string callBackFunctionString)
         {
             OnFavoriteButtonClicked(new JsButtonClickedEventArgs(statusId, callBackFunctionString));
         }
 
         // Will be called from JavaScript
-        public void Retweet(int statusId, string callBackFunctionString)
+        public void Retweet(long statusId, string callBackFunctionString)
         {
             OnRetweetButtonClicked(new JsButtonClickedEventArgs(statusId, callBackFunctionString));
         }
 
         // Will be called from JavaScript
-        public void Steal(int statusId, string callBackFunctionString)
+        public void Steal(long statusId, string callBackFunctionString)
         {
             OnStealButtonClicked(new JsButtonClickedEventArgs(statusId, callBackFunctionString));
         }
 
         // Will be called from JavaScript
-        public void Reply(int statusId, string callBackFunctionString)
+        public void Reply(long statusId, string callBackFunctionString)
         {
             OnReplyButtonClicked(new JsButtonClickedEventArgs(statusId, callBackFunctionString));
         }
 
         // Will be called from JavaScript
-        public void Destroy(int statusId, string callBackFunctionString)
+        public void Destroy(long statusId, string callBackFunctionString)
         {
             OnDestroyButtonClicked(new JsButtonClickedEventArgs(statusId, callBackFunctionString));
         }
 
         // Will be called from JavaScript
-        public void ShowStatus(int statusId)
+        public void ShowStatus(long statusId)
         {
             OnShowStatusCalled(new ShowStatusCalledEventArgs(statusId));
         }
 
         // Will be called from JavaScript
-        public void ShowUser(int userId)
+        public void ShowUser(long userId)
         {
             OnShowUserCalled(new ShowUserCalledEventArgs(userId));
         }
@@ -140,25 +140,25 @@ namespace StoneTank.Yukiusagi
             OnSearchCalled(new SearchCalledEventArgs(keyword));
         }
 
-        public bool IsOwnTweet(int statusId)
+        public bool IsOwnTweet(long statusId)
         {
             // Not Implemented
             return false;
         }
 
-        public bool IsReplyToMe(int statusId)
+        public bool IsReplyToMe(long statusId)
         {
             // Not Implemented
             return false;
         }
 
-        public bool IsFavorited(int statusId)
+        public bool IsFavorited(long statusId)
         {
             // Not Implemented
             return false;
         }
 
-        public bool IsRetweeted(int statusId)
+        public bool IsRetweeted(long statusId)
         {
             // Not Implemented
             return false;
@@ -173,14 +173,14 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// 対象の Status ID
         /// </summary>
-        public int StatusId { get; set; }
+        public long StatusId { get; set; }
 
         /// <summary>
         /// 処理が完了した際に呼び出される関数名、または実行される JavaScript コード。この内容は eval で評価されます。
         /// </summary>
         public string CallBackFunctionString { get; set; }
 
-        public JsButtonClickedEventArgs(int statusId, string callBackFunctionString)
+        public JsButtonClickedEventArgs(long statusId, string callBackFunctionString)
         {
             this.StatusId = statusId;
             this.CallBackFunctionString = callBackFunctionString;
@@ -195,9 +195,9 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// 対象の ID (Status ID や User ID)
         /// </summary>
-        public int StatusId { get; set; }
+        public long StatusId { get; set; }
 
-        public ShowStatusCalledEventArgs(int statusId)
+        public ShowStatusCalledEventArgs(long statusId)
         {
             this.StatusId = statusId;
         }
@@ -211,14 +211,14 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// ユーザ ID。UserId または ScreenName のいずれかを使用します。
         /// </summary>
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
         /// <summary>
         /// スクリーンネーム。UserId または ScreenName のいずれかを使用します。
         /// </summary>
         public string ScreenName { get; set; }
 
-        public ShowUserCalledEventArgs(int userId)
+        public ShowUserCalledEventArgs(long userId)
         {
             this.UserId = userId;
         }
@@ -228,7 +228,7 @@ namespace StoneTank.Yukiusagi
             this.ScreenName = screenName;
         }
 
-        public ShowUserCalledEventArgs(int userId, string screenName)
+        public ShowUserCalledEventArgs(long userId, string screenName)
         {
             this.UserId = userId;
             this.ScreenName = screenName;
