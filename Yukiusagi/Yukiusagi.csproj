@@ -196,7 +196,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\Loading.gif" />
+    <Content Include="Resources\Loading.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Photo.png" />
