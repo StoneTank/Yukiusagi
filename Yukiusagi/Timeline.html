@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <title>Yukiusagi Timeline HTML</title>
-    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+    <script src="jquery-3.2.1.min"></script>
+    <script src="moment.min.js"></script>
+    <script src="moment-timezone.js"></script>
     <script>
       // ひとつのステータスを追加します
       function addStatus(json)
@@ -150,21 +152,30 @@
         // 本文
         var detailHtml = status.retweeted_status != null ? status.retweeted_status.text : status.text;
 
-        // 本文: ハッシュタグ
-        (status.retweeted_status != null ? status.retweeted_status : status).entities.hashtags.forEach(function(value, index) {
-          detailHtml.replace(new RegExp('(#' + value.text + ')', 'g'), '\<a href="#" onclick="window.external.Search(\'$1\');"\>$1\</a\>');
+        // 本文: Entities: ハッシュタグ
+        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.hashtags, function(index, value) {
+          detailHtml = detailHtml.replace(new RegExp('(#' + value.text + ')', 'g'), '\<a href="#" onclick="window.external.Search(\'$1\');"\>$1\</a\>');
         });
 
-        // 本文: メディア
+        // 本文: Entities: メディア
+        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.media, function(index, value) {
+          detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
+        });
+
+        // 本文: Entities: リンク
+        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.urls, function(index, value) {
+          detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
+        });
+
+        // 本文: Entities: Mentions
+        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.user_mentions, function(index, value) {
+          detailHtml = detailHtml.replace(new RegExp('(@' + value.screen_name + ')', 'g'), '\<a href="#" title="' + value.name + '" onclick="window.external.ShowUser(\'' + value.id + '\');"\>$1\</a\>');
+        });
+
+        // 本文: Extended Entities: メディア
         var mediaHtml = "";
 
-        (status.retweeted_status != null ? status.retweeted_status : status).entities.media.forEach(function(value, index) {
-          detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
-        });
-
-        (status.retweeted_status != null ? status.retweeted_status : status).extended_entities.forEach(function(value, index) {
-          detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
-          mediaHtml += '\<br\>';
+        $.each((status.retweeted_status != null ? status.retweeted_status : status).extended_entities.media, function(index, value) {
 
           if (value.type == "photo")
           {
@@ -174,7 +185,7 @@
           {
             mediaHtml += '\<video controls poster="' + value.media_url_https + '"\>';
 
-            value.variants.forEach(function(v, i) {
+            $.each(value.variants, function(i, v) {
               if (v.content_type == "video/mp4")
               {
                 mediaHtml += '\<source src="' + v.url + '" type="' + v.content_type + '"\>';
@@ -185,15 +196,7 @@
           }
         });
 
-        // 本文: リンク
-        (status.retweeted_status != null ? status.retweeted_status : status).entities.urls.forEach(function(value, index) {
-          detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
-        });
-
-        // 本文: Mentions
-        (status.retweeted_status != null ? status.retweeted_status : status).entities.user_mentions.forEach(function(value, index) {
-          detailHtml.replace(new RegExp('(@' + value.screen_name + ')', 'g'), '\<a href="#" title="' + value.name + '" onclick="window.external.ShowUser(\'' + value.id + '\');"\>$1\</a\>');
-        });
+        if (mediaHtml != "") { mediaHtml = '\<br\>' + mediaHtml; }
 
         // フッター
         var footerHtml = (status.retweeted_status != null ? status.retweeted_status : status).created_at.toLocaleString() + ' via ' + (status.retweeted_status != null ? status.retweeted_status : status).source;
@@ -204,7 +207,7 @@
           '\</div\>\</div\>\<div class="detail"\>' + detailHtml + mediaHtml +
           '\</div\>\<div class="footer"\>' + footerHtml + '\</div\>';
 
-          return element;
+        return element;
       }
     </script>
     <style>
