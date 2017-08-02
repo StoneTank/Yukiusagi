@@ -47,7 +47,7 @@
       // 指定されたIDのステータスを Favorite するよう要求します
       function favorite(id)
       {
-        $("#" + id + " .favButton").attr('src', 'Resources/Loading.gif');
+        $("#" + id + " .favButton").attr('src', '../Resources/Loading.gif');
 
         var callback;
 
@@ -55,14 +55,14 @@
         {
           // unfav
           callback = function() {
-            window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', 'Resources/Fav.png');");
+            window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/Fav.png');");
           }
         }
         else
         {
           // fav
           callback = function() {
-            window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', 'Resources/FavActive.png');");
+            window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/FavActive.png');");
           }
         }
         
@@ -72,12 +72,12 @@
       // 指定されたIDのステータスをリツイートするよう要求します
       function retweet(id)
       {
-        $("#" + id + " .rtButton").attr('src', 'Resources/Loading.gif');
+        $("#" + id + " .rtButton").attr('src', '../Resources/Loading.gif');
 
         if (!window.external.IsRetweeted)
         {
           var callback = function() {
-            window.external.Retweet(id, "$('#" + id + " .rtButton').attr('src', 'Resources/RtActive.png');");
+            window.external.Retweet(id, "$('#" + id + " .rtButton').attr('src', '../Resources/RtActive.png');");
           };
 
           setTimeout(callback, 0);
@@ -86,10 +86,10 @@
 
       function steal(id)
       {
-        $("#" + id + " .stealButton").attr('src', 'Resources/Loading.gif');
+        $("#" + id + " .stealButton").attr('src', '../Resources/Loading.gif');
 
         var callback = function() {
-          window.external.Steal(id, "$('#" + id + " .stealButton').attr('src', 'Resources/Steal.png');");
+          window.external.Steal(id, "$('#" + id + " .stealButton').attr('src', '../Resources/Steal.png');");
         };
 
         setTimeout(callback, 0);
@@ -134,19 +134,19 @@
 
         // ボタン用HTML
         var destroyButtonHtml = window.external.IsOwnTweet(status.id) ? '' :
-          '\<a href="#"\>\<img class="destroyButton" src="Resources/Destroy.png" onclick="destroy(' + status.id + ');"\>\</a\>';
+          '\<a href="#"\>\<img class="destroyButton" src="../Resources/Destroy.png" onclick="destroy(' + status.id + ');"\>\</a\>';
 
-        var stealButtonHtml = window.external.IsOwnTweet(status.id) ? '' : '\<a href="#"\>\<img class="stealButton" src="Resources/Steal.png" onclick="steal(' + status.id + ');"\>\</a\>';
+        var stealButtonHtml = window.external.IsOwnTweet(status.id) ? '' : '\<a href="#"\>\<img class="stealButton" src="../Resources/Steal.png" onclick="steal(' + status.id + ');"\>\</a\>';
         
         var favRtButtonHtml = (status.retweeted_status != null || !status.user.protected) ?
-          '\<a href="#"\>\<img class="favRtButton" src="Resources/FavRt.png" onclick="favorite(' + status.id + '); retweet(' + status.id + ');"\>\</a\>' : '';
+          '\<a href="#"\>\<img class="favRtButton" src="../Resources/FavRt.png" onclick="favorite(' + status.id + '); retweet(' + status.id + ');"\>\</a\>' : '';
 
         var rtButtonHtml = (status.retweeted_status != null || !status.user.protected) ?
-          '\<a href="#"\>\<img class="rtButton" src="Resources/' + (status.retweeted ? 'RtActive.png' : 'Rt.png') + '" onclick="retweet(' + status.id + ');"\>\</a\>' : '';
+          '\<a href="#"\>\<img class="rtButton" src="../Resources/' + (status.retweeted ? 'RtActive.png' : 'Rt.png') + '" onclick="retweet(' + status.id + ');"\>\</a\>' : '';
 
-        var favButtonHtml = '\<a href="#"\>\<img class="favButton" src="Resources/' + (status.favorited ? 'FavActive.png' : 'Fav.png') + '" onclick="favorite(' + status.id + ');"\>\</a\>';
+        var favButtonHtml = '\<a href="#"\>\<img class="favButton" src="../Resources/' + (status.favorited ? 'FavActive.png' : 'Fav.png') + '" onclick="favorite(' + status.id + ');"\>\</a\>';
         
-        var replyButtonHtml = '\<a href="#"\>\<img src="Resources/Reply.png" onclick="window.external.Reply(' + status.id + ', \'\');"\>\</a\>';
+        var replyButtonHtml = '\<a href="#"\>\<img src="../Resources/Reply.png" onclick="window.external.Reply(' + status.id + ', \'\');"\>\</a\>';
 
         // 本文
         var displayStatus = status.retweeted_status != null ? status.retweeted_status : status;
