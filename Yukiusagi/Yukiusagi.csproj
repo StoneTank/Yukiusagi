@@ -196,9 +196,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HTML\jquery-3.2.1.min.js" />
-    <Content Include="HTML\moment-timezone.js" />
-    <Content Include="HTML\moment.min.js" />
+    <Content Include="HTML\jquery-3.2.1.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HTML\moment-timezone.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HTML\moment.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Loading.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>Yukiusagi Timeline HTML</title>
-    <script src="jquery-3.2.1.min"></script>
+    <script src="jquery-3.2.1.min.js"></script>
     <script src="moment.min.js"></script>
     <script src="moment-timezone.js"></script>
     <script>
@@ -199,7 +199,8 @@
         if (mediaHtml != "") { mediaHtml = '\<br\>' + mediaHtml; }
 
         // フッター
-        var footerHtml = (status.retweeted_status != null ? status.retweeted_status : status).created_at.toLocaleString() + ' via ' + (status.retweeted_status != null ? status.retweeted_status : status).source;
+        var footerHtml = moment.tz((status.retweeted_status != null ? status.retweeted_status : status).created_at, 'Etc/UTC').tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm:ss') +
+          ' via ' + (status.retweeted_status != null ? status.retweeted_status : status).source;
 
         // これらの値をくっつける
         element.innerHTML = '\<div class="header"\>\<div\>' + userHtml + '\</div\>\<div\>' +
