@@ -22,11 +22,10 @@
       function addStatusRange(json)
       {
         var callback = function() {
-          var array = JSON.parse(json);
           var html = "";
 
-          $.each(array, function(index, value) {
-            html = getElement(value).html() + html;
+          $.each(JSON.parse(json), function(index, value) {
+            html = getElement(value).outerHTML + html;
           });
 
           $("ul").prepend(html);
@@ -150,57 +149,78 @@
         var replyButtonHtml = '\<a href="#"\>\<img src="Resources/Reply.png" onclick="window.external.Reply(' + status.id + ', \'\');"\>\</a\>';
 
         // 本文
-        var detailHtml = status.retweeted_status != null ? status.retweeted_status.text : status.text;
+        var displayStatus = status.retweeted_status != null ? status.retweeted_status : status;
+        var detailHtml = displayStatus.full_text != null ? displayStatus.full_text : displayStatus.text;
 
-        // 本文: Entities: ハッシュタグ
-        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.hashtags, function(index, value) {
-          detailHtml = detailHtml.replace(new RegExp('(#' + value.text + ')', 'g'), '\<a href="#" onclick="window.external.Search(\'$1\');"\>$1\</a\>');
-        });
+        // 本文: Entities
+        if (displayStatus.entities != null)
+        {
+          // 本文: Entities: ハッシュタグ
+          if (displayStatus.entities.hashtags != null)
+          {
+            $.each(displayStatus.entities.hashtags, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp('(#' + value.text + ')', 'g'), '\<a href="#" onclick="window.external.Search(\'$1\');"\>$1\</a\>');
+            });
+          }
 
-        // 本文: Entities: メディア
-        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.media, function(index, value) {
-          detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
-        });
+          // 本文: Entities: メディア
+          if (displayStatus.entities.media != null)
+          {
+            $.each(displayStatus.entities.media, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
+            });
+          }
 
-        // 本文: Entities: リンク
-        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.urls, function(index, value) {
-          detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
-        });
+          // 本文: Entities: リンク
+          if (displayStatus.entities.urls != null)
+          {
+            $.each(displayStatus.entities.urls, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
+            });
+          }
 
-        // 本文: Entities: Mentions
-        $.each((status.retweeted_status != null ? status.retweeted_status : status).entities.user_mentions, function(index, value) {
-          detailHtml = detailHtml.replace(new RegExp('(@' + value.screen_name + ')', 'g'), '\<a href="#" title="' + value.name + '" onclick="window.external.ShowUser(\'' + value.id + '\');"\>$1\</a\>');
-        });
+          // 本文: Entities: Mentions
+          if (displayStatus.entities.user_mentions != null)
+          {
+            $.each(displayStatus.entities.user_mentions, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp('(@' + value.screen_name + ')', 'g'), '\<a href="#" title="' + value.name + ' $1" onclick="window.external.ShowUser(\'' + value.id + '\');"\>$1\</a\>');
+            });
+          }
+        }
 
         // 本文: Extended Entities: メディア
         var mediaHtml = "";
 
-        $.each((status.retweeted_status != null ? status.retweeted_status : status).extended_entities.media, function(index, value) {
+        if (displayStatus.extended_entities != null &&
+          displayStatus.extended_entities.media != null)
+        {
+          $.each(displayStatus.extended_entities.media, function(index, value) {
 
-          if (value.type == "photo")
-          {
-            mediaHtml += '\<a href="' + value.media_url_https + '"\>\<img src="' + value.media_url_https + '"\>\</a\>';
-          }
-          else if (value.type == "video" || value.type == "animated_gif")
-          {
-            mediaHtml += '\<video controls poster="' + value.media_url_https + '"\>';
+            if (value.type == "photo")
+            {
+              mediaHtml += '\<a href="' + value.media_url_https + '"\>\<img src="' + value.media_url_https + '"\>\</a\>';
+            }
+            else if (value.type == "video" || value.type == "animated_gif")
+            {
+              mediaHtml += '\<video controls poster="' + value.media_url_https + '"\>';
 
-            $.each(value.variants, function(i, v) {
-              if (v.content_type == "video/mp4")
-              {
-                mediaHtml += '\<source src="' + v.url + '" type="' + v.content_type + '"\>';
-              }
-            });
+              $.each(value.variants, function(i, v) {
+                if (v.content_type == "video/mp4")
+                {
+                  mediaHtml += '\<source src="' + v.url + '" type="' + v.content_type + '"\>';
+                }
+              });
 
-            mediaHtml += '\</video\>';
-          }
-        });
+              mediaHtml += '\</video\>';
+            }
+          });
+        }
 
         if (mediaHtml != "") { mediaHtml = '\<br\>' + mediaHtml; }
 
         // フッター
-        var footerHtml = moment.tz((status.retweeted_status != null ? status.retweeted_status : status).created_at, 'Etc/UTC').tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm:ss') +
-          ' via ' + (status.retweeted_status != null ? status.retweeted_status : status).source;
+        var footerHtml = moment.tz(displayStatus.created_at, 'Etc/UTC').tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm:ss') +
+          ' via ' + displayStatus.source;
 
         // これらの値をくっつける
         element.innerHTML = '\<div class="header"\>\<div\>' + userHtml + '\</div\>\<div\>' +
@@ -283,10 +303,7 @@
     </style>
   </head>
   <body>
-    <textarea id="debug"></textarea><br>
-    <input type="button" onclick="addStatus($('#debug').val());" value="Add">
     <ul>
-      
     </ul>
   </body>
 </html>
