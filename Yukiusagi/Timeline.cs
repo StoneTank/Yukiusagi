@@ -7,7 +7,7 @@ namespace StoneTank.Yukiusagi
     /// タイムラインのプロパティを管理します
     /// </summary>
     [Serializable]
-    public class TimelinePropertySet
+    public class TimelineProperty
     {
         /// <summary>タイムラインの種類</summary>
         public TimelineType Type { get; set; }
