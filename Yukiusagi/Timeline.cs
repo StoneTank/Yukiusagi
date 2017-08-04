@@ -9,6 +9,9 @@ namespace StoneTank.Yukiusagi
     [Serializable]
     public class TimelineProperty
     {
+        /// <summary>タイムラインのタブなどに表示されるテキスト</summary>
+        public string Text { get; set; }
+
         /// <summary>タイムラインの種類</summary>
         public TimelineType Type { get; set; }
 

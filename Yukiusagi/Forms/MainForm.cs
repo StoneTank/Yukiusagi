@@ -120,7 +120,7 @@ namespace StoneTank.Yukiusagi
                         // 文字列から該当する Form を見つけて返す
                         if (s.EndsWith(nameof(TimelineForm)))
                         {
-                            return new TimelineForm();
+                            return new TimelineForm() { PersistString = s }; // PersistString は以前のものをひきつぐ
                         }
                         else
                         {
