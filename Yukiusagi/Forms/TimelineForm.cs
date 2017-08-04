@@ -45,7 +45,7 @@ namespace StoneTank.Yukiusagi
         {
             InitializeComponent();
 
-            // PersistString が空の場合は決める。なお、PersistString 以外のプロパティは親で決めて代入しておくことにする。
+            // PersistString が空の場合は決める
 
             if (string.IsNullOrEmpty(PersistString))
             {

@@ -92,7 +92,7 @@ namespace StoneTank.Yukiusagi
         }
 
         #endregion
-
+        
         #region MainForm
 
         public MainForm()
@@ -163,6 +163,39 @@ namespace StoneTank.Yukiusagi
                     {
                         TwitterAccounts = Settings.Default.TwitterAccounts;
                         await Task.WhenAll(TwitterAccounts.Select(async account => await account.CreateAsync()));
+                    }
+
+                    // REST API
+                    var statuses = new List<Status>();
+
+                    await Task.WhenAll(TimelineProperties.Select(async p =>
+                    {
+                        switch (p.Value.Type)
+                        {
+                            case TimelineType.Home:
+                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                {
+                                    await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.HomeTimelineAsync();
+                                }));
+                                break;
+                            case TimelineType.Mentions:
+                                break;
+                            case TimelineType.Messages:
+                                break;
+                            case TimelineType.List:
+                                break;
+                            case TimelineType.User:
+                                break;
+                            case TimelineType.Search:
+                                break;
+                            default:
+                                break;
+                        }
+                    }));
+
+                    foreach (var item in collection)
+                    {
+
                     }
                 }
                 catch (OperationCanceledException)
