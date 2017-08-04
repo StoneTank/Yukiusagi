@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Yukiusagi Timeline HTML</title>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="moment.min.js"></script>
+    <script src="moment-timezone.js"></script>
+    <script>
+      // ひとつのステータスを追加します
+      function addStatus(json)
+      {
+        var callback = function() {
+          var status = JSON.parse(json);
+          $("ul").prepend(getElement(status));
+        };
+
+        setTimeout(callback, 0);
+      }
+
+      // 複数のステータスを追加します
+      function addStatusRange(json)
+      {
+        var callback = function() {
+          var html = "";
+
+          $.each(JSON.parse(json), function(index, value) {
+            html = getElement(value).outerHTML + html;
+          });
+
+          $("ul").prepend(html);
+        };
+
+        setTimeout(callback, 0);
+      }
+
+      // 指定されたIDのステータスを削除するよう要求します
+      function destroy(id)
+      {
+        var callback = function() {
+          window.external.Destroy(id, "");
+        }
+
+        setTimeout(callback, 0);
+      }
+
+      // 指定されたIDのステータスを Favorite するよう要求します
+      function favorite(id)
+      {
+        $("#" + id + " .favButton").attr('src', '../Resources/Loading.gif');
+
+        var callback;
+
+        if (window.external.IsFavorited)
+        {
+          // unfav
+          callback = function() {
+            window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/Fav.png');");
+          }
+        }
+        else
+        {
+          // fav
+          callback = function() {
+            window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/FavActive.png');");
+          }
+        }
+        
+        setTimeout(callback, 0);
+      }
+
+      // 指定されたIDのステータスをリツイートするよう要求します
+      function retweet(id)
+      {
+        $("#" + id + " .rtButton").attr('src', '../Resources/Loading.gif');
+
+        if (!window.external.IsRetweeted)
+        {
+          var callback = function() {
+            window.external.Retweet(id, "$('#" + id + " .rtButton').attr('src', '../Resources/RtActive.png');");
+          };
+
+          setTimeout(callback, 0);
+        }
+      }
+
+      function steal(id)
+      {
+        $("#" + id + " .stealButton").attr('src', '../Resources/Loading.gif');
+
+        var callback = function() {
+          window.external.Steal(id, "$('#" + id + " .stealButton').attr('src', '../Resources/Steal.png');");
+        };
+
+        setTimeout(callback, 0);
+      }
+
+      // 指定された status オブジェクトからタイムライン表示用 Element を生成して返します
+      function getElement(status)
+      {
+        var element = document.createElement("li");
+        
+        // ステータス ID
+        element.setAttribute("id", status.id);
+
+        if (status.retweeted_status != null) {
+          // リツイート
+          element.setAttribute("class", "rt");
+        }
+        else if (window.external.IsReplyToMe(status.id)) {
+          // リプライ
+          element.setAttribute("class", "reply");
+        }
+        else if (window.external.IsOwnTweet(status.id)) {
+          // 自分のツイート
+          element.setAttribute("class", "own");
+        }
+
+        // style 属性でアイコンを指定
+        element.setAttribute("style", "background-image: url('" +
+        (status.retweeted_status != null ? status.retweeted_status.user.profile_image_url_https : status.user.profile_image_url_https) + "');");
+
+        // ユーザ名表示欄
+        var userHtml;
+        if (status.retweeted_status != null) {
+          // 名前 @screen_name (Retweeted by @screen_name)
+          userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.retweeted_status.user.id + ');"\>' + status.retweeted_status.user.name + ' @' + status.retweeted_status.user.screen_name +
+          '\</a\> (Retweeted by \<a href="#" onclick="window.external.ShowUser(' + status.user.id + ');"\>@' + status.user.screen_name + '\</a\>)';
+        }
+        else {
+          // 名前 @screen_name
+          userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.user.id + ');"\>' + status.user.name + ' @' + status.user.screen_name + '\</a\>';
+        }
+
+        // ボタン用HTML
+        var destroyButtonHtml = window.external.IsOwnTweet(status.id) ? '' :
+          '\<a href="#"\>\<img class="destroyButton" src="../Resources/Destroy.png" onclick="destroy(' + status.id + ');"\>\</a\>';
+
+        var stealButtonHtml = window.external.IsOwnTweet(status.id) ? '' : '\<a href="#"\>\<img class="stealButton" src="../Resources/Steal.png" onclick="steal(' + status.id + ');"\>\</a\>';
+        
+        var favRtButtonHtml = (status.retweeted_status != null || !status.user.protected) ?
+          '\<a href="#"\>\<img class="favRtButton" src="../Resources/FavRt.png" onclick="favorite(' + status.id + '); retweet(' + status.id + ');"\>\</a\>' : '';
+
+        var rtButtonHtml = (status.retweeted_status != null || !status.user.protected) ?
+          '\<a href="#"\>\<img class="rtButton" src="../Resources/' + (status.retweeted ? 'RtActive.png' : 'Rt.png') + '" onclick="retweet(' + status.id + ');"\>\</a\>' : '';
+
+        var favButtonHtml = '\<a href="#"\>\<img class="favButton" src="../Resources/' + (status.favorited ? 'FavActive.png' : 'Fav.png') + '" onclick="favorite(' + status.id + ');"\>\</a\>';
+        
+        var replyButtonHtml = '\<a href="#"\>\<img src="../Resources/Reply.png" onclick="window.external.Reply(' + status.id + ', \'\');"\>\</a\>';
+
+        // 本文
+        var displayStatus = status.retweeted_status != null ? status.retweeted_status : status;
+        var detailHtml = displayStatus.full_text != null ? displayStatus.full_text : displayStatus.text;
+
+        // 本文: Entities
+        if (displayStatus.entities != null)
+        {
+          // 本文: Entities: ハッシュタグ
+          if (displayStatus.entities.hashtags != null)
+          {
+            $.each(displayStatus.entities.hashtags, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp('(#' + value.text + ')', 'g'), '\<a href="#" onclick="window.external.Search(\'$1\');"\>$1\</a\>');
+            });
+          }
+
+          // 本文: Entities: メディア
+          if (displayStatus.entities.media != null)
+          {
+            $.each(displayStatus.entities.media, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
+            });
+          }
+
+          // 本文: Entities: リンク
+          if (displayStatus.entities.urls != null)
+          {
+            $.each(displayStatus.entities.urls, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
+            });
+          }
+
+          // 本文: Entities: Mentions
+          if (displayStatus.entities.user_mentions != null)
+          {
+            $.each(displayStatus.entities.user_mentions, function(index, value) {
+              detailHtml = detailHtml.replace(new RegExp('(@' + value.screen_name + ')', 'g'), '\<a href="#" title="' + value.name + ' $1" onclick="window.external.ShowUser(\'' + value.id + '\');"\>$1\</a\>');
+            });
+          }
+        }
+
+        // 本文: Extended Entities: メディア
+        var mediaHtml = "";
+
+        if (displayStatus.extended_entities != null &&
+          displayStatus.extended_entities.media != null)
+        {
+          $.each(displayStatus.extended_entities.media, function(index, value) {
+
+            if (value.type == "photo")
+            {
+              mediaHtml += '\<a href="' + value.media_url_https + '"\>\<img src="' + value.media_url_https + '"\>\</a\>';
+            }
+            else if (value.type == "video" || value.type == "animated_gif")
+            {
+              mediaHtml += '\<video controls poster="' + value.media_url_https + '"\>';
+
+              $.each(value.variants, function(i, v) {
+                if (v.content_type == "video/mp4")
+                {
+                  mediaHtml += '\<source src="' + v.url + '" type="' + v.content_type + '"\>';
+                }
+              });
+
+              mediaHtml += '\</video\>';
+            }
+          });
+        }
+
+        if (mediaHtml != "") { mediaHtml = '\<br\>' + mediaHtml; }
+
+        // フッター
+        var footerHtml = moment.tz(displayStatus.created_at, 'Etc/UTC').tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm:ss') +
+          ' via ' + displayStatus.source;
+
+        // これらの値をくっつける
+        element.innerHTML = '\<div class="header"\>\<div\>' + userHtml + '\</div\>\<div\>' +
+          destroyButtonHtml + stealButtonHtml + favRtButtonHtml + rtButtonHtml + favButtonHtml + replyButtonHtml +
+          '\</div\>\</div\>\<div class="detail"\>' + detailHtml + mediaHtml +
+          '\</div\>\<div class="footer"\>' + footerHtml + '\</div\>';
+
+        return element;
+      }
+    </script>
+    <style>
+      ul {
+        font-family: "Segoe UI Emoji", "Segoe UI", "Meiryo UI", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+      }
+      li {
+        background-position: 4px center;
+        background-repeat: no-repeat;
+        border-bottom: 1px solid #f5f5f5;
+        border-left: 2px solid #ffffff;
+        list-style: none;
+        margin: 0;
+        padding: 4px 0 4px 60px;
+      }
+      li:hover {
+        background-color: #f5f5f5;
+      }
+
+      /* own tweet */
+      .own { border-left: 2px solid #0099ff; }
+      /* retweet */
+      .rt { border-left: 2px solid #66ff99; }
+      /* reply to me */
+      .reply { border-left: 2px solid #ff99cc; }
+
+      /* name, screen name, and buttons */
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        cursor: default;
+        margin: 0;
+        padding: 0;
+      }
+      .header a {
+        color: #000000;
+        font-weight: bold;
+        text-decoration: none;
+      }
+      .header img {
+        height: 22px;
+      }
+
+      .detail img, .detail video {
+        margin: 10px 4px 4px 0;
+        border: 1px solid #f5f5f5;
+        max-width: 240px;
+      }
+      .detail img {
+        max-height: 180px;
+      }
+      .detail video {
+        max-height: 360px;
+      }
+
+      /* date, time, via */
+      .footer {
+        color: #708090;
+        font-size: 80%;
+        margin: 4px 0 0 0;
+        padding: 0;
+      }
+      .footer a {
+        color: #708090;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+    </ul>
+  </body>
+</html>
