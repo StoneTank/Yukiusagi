@@ -48,9 +48,9 @@ namespace StoneTank.Yukiusagi.Properties
         /// </summary>
         [UserScopedSetting()]
         [DefaultSettingValue("")]
-        public List<TimelineProperty> TimelineProperties
+        public Dictionary<string, TimelineProperty> TimelineProperties
         {
-            get { return (List<TimelineProperty>)(this["TimelineProperties"]); }
+            get { return (Dictionary<string, TimelineProperty>)(this["TimelineProperties"]); }
             set { this["TimelineProperties"] = value; }
         }
     }
