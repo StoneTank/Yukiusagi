@@ -14,14 +14,9 @@ namespace StoneTank.Yukiusagi
         #region Properties
 
         /// <summary>
-        /// このタイムラインが受信したステータスのリストです
-        /// </summary>
-        public List<Status> Statuses { get; set; }
-
-        /// <summary>
         /// JavaScript といっしょにがんばる
         /// </summary>
-        public JsFront JsFront { get; set; } = new JsFront();
+        public JsFront JsFront { get; set; }
 
         /// <summary>
         /// タイムラインのプロパティ
@@ -50,6 +45,8 @@ namespace StoneTank.Yukiusagi
         {
             InitializeComponent();
 
+            // PersistString が空の場合は決める。なお、PersistString 以外のプロパティは親で決めて代入しておくことにする。
+
             if (string.IsNullOrEmpty(PersistString))
             {
                 // DockContent を区別するための文字列 ("0:TimelineForm" の形式)
@@ -77,6 +74,8 @@ namespace StoneTank.Yukiusagi
                     throw new TimelineSetupException();
                 }
             }
+
+            JsFront = new JsFront(TimelineProperty);
         }
 
         /// <summary>
@@ -85,7 +84,7 @@ namespace StoneTank.Yukiusagi
         /// <param name="status">追加するステータス</param>
         public async void NewStatus(Status status)
         {
-            Statuses.Add(status);
+            JsFront.Statuses.Add(status);
 
             // JavaScript に投げる JSON
             string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(status));
@@ -102,7 +101,7 @@ namespace StoneTank.Yukiusagi
         /// <param name="statuses">追加するステータス</param>
         public async void NewStatusRange(List<Status> statuses)
         {
-            Statuses.AddRange(statuses);
+            JsFront.Statuses.AddRange(statuses);
 
             // JavaScript に投げる JSON
             string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(statuses));
@@ -119,9 +118,9 @@ namespace StoneTank.Yukiusagi
         /// <param name="id">削除するステータスID</param>
         public void RemoveStatus(long id)
         {
-            if (Statuses.Exists(s => s.Id == id))
+            if (JsFront.Statuses.Exists(s => s.Id == id))
             {
-                Statuses.RemoveAll(s => s.Id == id);
+                JsFront.Statuses.RemoveAll(s => s.Id == id);
             }
 
             if (!webBrowser.IsBusy)

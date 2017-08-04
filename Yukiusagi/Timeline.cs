@@ -15,7 +15,7 @@ namespace StoneTank.Yukiusagi
         /// <summary>タイムラインの種類</summary>
         public TimelineType Type { get; set; }
 
-        /// <summary>種類が Home または Mentions の場合、受信アカウントのID</summary>
+        /// <summary>受信アカウントのID</summary>
         public List<long> AccountIds { get; set; }
 
         /// <summary>種類が User の場合、当該ユーザID</summary>

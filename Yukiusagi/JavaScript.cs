@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CoreTweet;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace StoneTank.Yukiusagi
@@ -6,6 +8,24 @@ namespace StoneTank.Yukiusagi
     [ComVisible(true)]
     public class JsFront
     {
+        /// <summary>
+        /// タイムラインのプロパティ
+        /// </summary>
+        public TimelineProperty TimelineProperty { get; set; }
+
+        /// <summary>
+        /// この JsFront をもつタイムラインが受信したステータスのリストです
+        /// </summary>
+        public List<Status> Statuses { get; set; }
+
+        /// <summary>
+        /// JsFront を初期化します
+        /// </summary>
+        public JsFront(TimelineProperty property)
+        {
+            TimelineProperty = property;
+        }
+
         /// <summary>
         /// JavaScript 側で window.external.Favorite(...) が呼び出された時に発生します。
         /// </summary>
@@ -140,28 +160,68 @@ namespace StoneTank.Yukiusagi
             OnSearchCalled(new SearchCalledEventArgs(keyword));
         }
 
+        // Will be called from JavaScript
         public bool IsOwnTweet(long statusId)
         {
-            // Not Implemented
-            return false;
+            var userId = Statuses.Find(s => s.Id == statusId).User.Id;
+
+            if (userId.HasValue)
+            {
+                return TimelineProperty.AccountIds.IndexOf(userId.Value) >= 0;
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        // Will be called from JavaScript
         public bool IsReplyToMe(long statusId)
         {
-            // Not Implemented
-            return false;
+            var replyToStatusId = Statuses.Find(s => s.Id == statusId).InReplyToStatusId;
+
+            if (replyToStatusId.HasValue)
+            {
+                return statusId == replyToStatusId.Value;
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        // Will be called from JavaScript
         public bool IsFavorited(long statusId)
         {
-            // Not Implemented
-            return false;
+            var status = Statuses.Find(s => s.Id == statusId);
+
+            var favorited = (status.RetweetedStatus ?? status).IsFavorited;
+
+            if (favorited.HasValue)
+            {
+                return favorited.Value;
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        // Will be called from JavaScript
         public bool IsRetweeted(long statusId)
         {
-            // Not Implemented
-            return false;
+            var status = Statuses.Find(s => s.Id == statusId);
+
+            var retweeted = (status.RetweetedStatus ?? status).IsRetweeted;
+
+            if (retweeted.HasValue)
+            {
+                return retweeted.Value;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
