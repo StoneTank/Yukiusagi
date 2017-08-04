@@ -34,6 +34,16 @@
         setTimeout(callback, 0);
       }
 
+      // 指定されたIDのステータスを表示から削除します
+      function removeStatus(id)
+      {
+        var callback = function() {
+          $("#" + id).remove();
+        };
+
+        setTimeout(callback, 0);
+      }
+
       // 指定されたIDのステータスを削除するよう要求します
       function destroy(id)
       {
