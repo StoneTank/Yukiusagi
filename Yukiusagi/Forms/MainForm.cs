@@ -25,6 +25,11 @@ namespace StoneTank.Yukiusagi
         private List<TwitterAccount> TwitterAccounts = new List<TwitterAccount>();
 
         /// <summary>
+        /// タイムライン設定を一括して管理します
+        /// </summary>
+        private Dictionary<string, TimelineProperty> TimelineProperties = new Dictionary<string, TimelineProperty>();
+
+        /// <summary>
         /// アップロードしようとしているファイル名
         /// </summary>
         private List<string> UploadingFileNames = new List<string>();
@@ -100,9 +105,10 @@ namespace StoneTank.Yukiusagi
             this.Size = Settings.Default.WindowSize;
             this.WindowState = Settings.Default.WindowState;
 
-            splitContainer.SplitterDistance = Settings.Default.SplitterDistance;
-
             tweetTextBox.Font = Settings.Default.Font;
+
+            splitContainer.SplitterDistance = Settings.Default.SplitterDistance;
+            TimelineProperties = Settings.Default.TimelineProperties;
 
             // レイアウト情報
             if (!string.IsNullOrEmpty(Settings.Default.WindowLayout))
@@ -209,6 +215,7 @@ namespace StoneTank.Yukiusagi
                 }
 
                 Settings.Default.SplitterDistance = splitContainer.SplitterDistance;
+                Settings.Default.TimelineProperties = TimelineProperties;
                 
                 // レイアウト情報を同じファイルにつっこむ
                 using (MemoryStream stream = new MemoryStream())
