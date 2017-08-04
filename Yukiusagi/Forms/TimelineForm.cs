@@ -92,7 +92,7 @@ namespace StoneTank.Yukiusagi
 
             if (!webBrowser.IsBusy)
             {
-                webBrowser.Document.InvokeScript("addStatus", new object[] { json });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusFunctionName"], new object[] { json });
             }
         }
 
@@ -109,7 +109,7 @@ namespace StoneTank.Yukiusagi
 
             if (!webBrowser.IsBusy)
             {
-                webBrowser.Document.InvokeScript("addStatusRange", new object[] { json });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusRangeFunctionName"], new object[] { json });
             }
         }
 
@@ -126,7 +126,7 @@ namespace StoneTank.Yukiusagi
 
             if (!webBrowser.IsBusy)
             {
-                webBrowser.Document.InvokeScript("removeStatus", new object[] { id });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["RemoveStatusFunctionName"], new object[] { id });
             }
         }
 
@@ -134,12 +134,20 @@ namespace StoneTank.Yukiusagi
         {
             webBrowser.ObjectForScripting = JsFront;
 
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["TimelineHtmlUri"]))
-            {
-                var baseUri = new Uri($"file:///{Application.StartupPath.Replace(Path.DirectorySeparatorChar, '/')}/");
+            // タイムライン HTML の URI 生成
+            var baseUri = new Uri($"file:///{Application.StartupPath.Replace(Path.DirectorySeparatorChar, '/')}/");
+            var uri = new Uri(baseUri, ConfigurationManager.AppSettings["TimelineHtmlUri"]);
 
-                webBrowser.Navigate(new Uri(baseUri, ConfigurationManager.AppSettings["TimelineHtmlUri"]));
+            if (File.Exists(uri.ToString()))
+            {
+                webBrowser.Navigate(uri);
             }
+            else
+            {
+                MessageBox.Show(this.ParentForm, "指定されたタイムライン HTML ファイルが存在しません。", "ゆきうさぎ", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
+            }
+
         }
 
         private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
