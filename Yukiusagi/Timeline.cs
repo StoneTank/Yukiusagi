@@ -10,7 +10,7 @@ namespace StoneTank.Yukiusagi
     public class TimelineProperty
     {
         /// <summary>タイムラインのタブなどに表示されるテキスト</summary>
-        [Obsolete]public string Text { get; set; }
+        public string Text { get; set; }
 
         /// <summary>タイムラインの種類</summary>
         public TimelineType Type { get; set; }
@@ -30,7 +30,6 @@ namespace StoneTank.Yukiusagi
         {
             Type = type;
             Text = text;
-            UserId = userId;
             if (accountIds.Length > 0) { AccountIds.AddRange(accountIds); }
         }
 
