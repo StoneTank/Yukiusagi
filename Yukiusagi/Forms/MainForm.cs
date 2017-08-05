@@ -25,11 +25,6 @@ namespace StoneTank.Yukiusagi
         private List<TwitterAccount> TwitterAccounts = new List<TwitterAccount>();
 
         /// <summary>
-        /// タイムライン設定を一括して管理します
-        /// </summary>
-        private Dictionary<string, TimelineProperty> TimelineProperties = new Dictionary<string, TimelineProperty>();
-
-        /// <summary>
         /// アップロードしようとしているファイル名
         /// </summary>
         private List<string> UploadingFileNames = new List<string>();
@@ -108,7 +103,6 @@ namespace StoneTank.Yukiusagi
             tweetTextBox.Font = Settings.Default.Font;
 
             splitContainer.SplitterDistance = Settings.Default.SplitterDistance;
-            TimelineProperties = Settings.Default.TimelineProperties;
 
             // レイアウト情報
             if (!string.IsNullOrEmpty(Settings.Default.WindowLayout))
@@ -166,36 +160,80 @@ namespace StoneTank.Yukiusagi
                     }
 
                     // REST API
-                    var statuses = new List<Status>();
-
-                    await Task.WhenAll(TimelineProperties.Select(async p =>
+                    
+                    await Task.WhenAll(Settings.Default.TimelineProperties.Select(async p =>
                     {
                         switch (p.Value.Type)
                         {
                             case TimelineType.Home:
+                                var home = new List<Status>();
+
                                 await Task.WhenAll(p.Value.AccountIds.Select(async id =>
                                 {
-                                    await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.HomeTimelineAsync();
+                                    home.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.HomeTimelineAsync(
+                                        count => Settings.Default.StatusesCount, exclude_replies => true));
                                 }));
+
+                                ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                .NewStatusRange(home.OrderByDescending(s => s.Id).ToList());
+
                                 break;
                             case TimelineType.Mentions:
-                                break;
-                            case TimelineType.Messages:
-                                break;
-                            case TimelineType.List:
+                                var mentions = new List<Status>();
+
+                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                {
+                                    mentions.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.MentionsTimelineAsync(
+                                        count => Settings.Default.StatusesCount));
+                                }));
+
+                                ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                .NewStatusRange(mentions.OrderByDescending(s => s.Id).ToList());
+
                                 break;
                             case TimelineType.User:
+                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                {
+                                    ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                    .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Statuses.UserTimelineAsync(
+                                        count => Settings.Default.StatusesCount, user_id => p.Value.UserId)).OrderByDescending(s => s.Id).ToList());
+                                }));
                                 break;
                             case TimelineType.Search:
+                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                {
+                                    ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                    .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Search.TweetsAsync(
+                                        count => Settings.Default.StatusesCount, q => p.Value.SearchKeyword)).OrderByDescending(s => s.Id).ToList());
+                                }));
                                 break;
                             default:
                                 break;
                         }
                     }));
 
-                    foreach (var item in collection)
-                    {
+                    // User Stream
 
+                    foreach (var account in TwitterAccounts)
+                    {
+                        account.StreamingMessageReceived += (s, message) =>
+                        {
+                            if (message.Type == CoreTweet.Streaming.MessageType.Create)
+                            {
+                                (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
+                                ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
+                                (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
+                                .NewStatus((message as CoreTweet.Streaming.StatusMessage).Status);
+                            }
+                            else if (message.Type == CoreTweet.Streaming.MessageType.DeleteStatus)
+                            {
+                                (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
+                                ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
+                                (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
+                                .RemoveStatus((message as CoreTweet.Streaming.StatusMessage).Status.Id);
+                            }
+                        };
+                        account.StartUserStream();
                     }
                 }
                 catch (OperationCanceledException)
@@ -248,8 +286,14 @@ namespace StoneTank.Yukiusagi
                 }
 
                 Settings.Default.SplitterDistance = splitContainer.SplitterDistance;
-                Settings.Default.TimelineProperties = TimelineProperties;
-                
+
+                Settings.Default.TimelineProperties.Clear();
+
+                foreach (var item in dockPanel.Contents.Where(c => c is TimelineForm))
+                {
+                    Settings.Default.TimelineProperties.Add((item as TimelineForm).PersistString, (item as TimelineForm).TimelineProperty);
+                }
+
                 // レイアウト情報を同じファイルにつっこむ
                 using (MemoryStream stream = new MemoryStream())
                 {
