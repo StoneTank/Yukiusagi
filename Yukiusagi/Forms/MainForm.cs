@@ -114,7 +114,7 @@ namespace StoneTank.Yukiusagi
                         // 文字列から該当する Form を見つけて返す
                         if (s.EndsWith(nameof(TimelineForm)))
                         {
-                            return new TimelineForm() { PersistString = s }; // PersistString は以前のものをひきつぐ
+                            return new TimelineForm(s); // PersistString は以前のものをひきつぐ
                         }
                         else
                         {
@@ -154,17 +154,17 @@ namespace StoneTank.Yukiusagi
                                     TabText = $"Home @{account.User.ScreenName}"
                                 };
 
-                                Settings.Default.TimelineProperties.Add(homeTab.PersistString, homeTab.TimelineProperty);
+                                Settings.Default.TimelineProperties.Add(homeTab.TimelineProperty);
 
                                 homeTab.Show(dockPanel);
                                 homeTab.DockState = DockState.Document;
 
-                                var mentionsTab = new TimelineForm(new TimelineProperty(TimelineType.Mentions, $"Home @{account.User.ScreenName}", account.User.Id.Value))
+                                var mentionsTab = new TimelineForm(new TimelineProperty(TimelineType.Mentions, $"Mentions @{account.User.ScreenName}", account.User.Id.Value))
                                 {                              
-                                    Text = $"Home @{account.User.ScreenName}",
-                                    TabText = $"Home @{account.User.ScreenName}"
+                                    Text = $"Mentions @{account.User.ScreenName}",
+                                    TabText = $"Mentions @{account.User.ScreenName}"
                                 };
-                                Settings.Default.TimelineProperties.Add(mentionsTab.PersistString, mentionsTab.TimelineProperty);
+                                Settings.Default.TimelineProperties.Add(mentionsTab.TimelineProperty);
 
                                 mentionsTab.Show(dockPanel);
                                 mentionsTab.DockState = DockState.Document;
@@ -185,48 +185,48 @@ namespace StoneTank.Yukiusagi
                     
                     await Task.WhenAll(Settings.Default.TimelineProperties.Select(async p =>
                     {
-                        switch (p.Value.Type)
+                        switch (p.Type)
                         {
                             case TimelineType.Home:
                                 var home = new List<Status>();
 
-                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
                                     home.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.HomeTimelineAsync(
                                         count => Settings.Default.StatusesCount, exclude_replies => true));
                                 }));
 
-                                ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
                                 .NewStatusRange(home.OrderBy(s => s.Id).ToList());
 
                                 break;
                             case TimelineType.Mentions:
                                 var mentions = new List<Status>();
 
-                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
                                     mentions.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.MentionsTimelineAsync(
                                         count => Settings.Default.StatusesCount));
                                 }));
 
-                                ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
                                 .NewStatusRange(mentions.OrderBy(s => s.Id).ToList());
 
                                 break;
                             case TimelineType.User:
-                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
-                                    ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                    ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
                                     .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Statuses.UserTimelineAsync(
-                                        count => Settings.Default.StatusesCount, user_id => p.Value.UserId)).OrderByDescending(s => s.Id).ToList());
+                                        count => Settings.Default.StatusesCount, user_id => p.UserId)).OrderByDescending(s => s.Id).ToList());
                                 }));
                                 break;
                             case TimelineType.Search:
-                                await Task.WhenAll(p.Value.AccountIds.Select(async id =>
+                                await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
-                                    ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
+                                    ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
                                     .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Search.TweetsAsync(
-                                        count => Settings.Default.StatusesCount, q => p.Value.SearchKeyword)).OrderByDescending(s => s.Id).ToList());
+                                        count => Settings.Default.StatusesCount, q => p.SearchKeyword)).OrderByDescending(s => s.Id).ToList());
                                 }));
                                 break;
                             default:
@@ -242,24 +242,49 @@ namespace StoneTank.Yukiusagi
                         {
                             if (message.Type == CoreTweet.Streaming.MessageType.Create)
                             {
-                                var sMessage = message as CoreTweet.Streaming.StatusMessage;
-
-                                if (sMessage != null)
+                                if (message is CoreTweet.Streaming.StatusMessage sMessage)
                                 {
                                     Invoke((MethodInvoker)(() =>
                                     {
-                                        (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
-                                        ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
-                                        (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
-                                        .NewStatus(sMessage.Status);
+                                        foreach (var dockContent in (dockPanel.Contents.Where(c => c is TimelineForm)
+                                            .Where(c =>
+                                                ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
+                                                (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)
+                                            )))
+                                        {
+                                            // Home
+                                            if ((dockContent as TimelineForm).TimelineProperty.Type == TimelineType.Home &&
+                                            (dockContent as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value))
+                                            {
+                                                (dockContent as TimelineForm).NewStatus(sMessage.Status);
+                                            }
+
+                                            // Mentions
+                                            if ((dockContent as TimelineForm).TimelineProperty.Type == TimelineType.Mentions &&
+                                            sMessage.Status.ExtendedEntities != null && sMessage.Status.ExtendedEntities.UserMentions != null)
+                                            {
+                                                var isReplyToMe = false;
+
+                                                foreach (var item in sMessage.Status.ExtendedEntities.UserMentions)
+                                                {
+                                                    if (item.Id.HasValue && (dockContent as TimelineForm).TimelineProperty.AccountIds.Contains(item.Id.Value))
+                                                    {
+                                                        isReplyToMe = true;
+                                                    }
+                                                }
+
+                                                if (isReplyToMe)
+                                                {
+                                                    (dockContent as TimelineForm).NewStatus(sMessage.Status);
+                                                }
+                                            }
+                                        }
                                     }));
                                 }
                             }
                             else if (message.Type == CoreTweet.Streaming.MessageType.DeleteStatus)
                             {
-                                var sMessage = message as CoreTweet.Streaming.StatusMessage;
-
-                                if (sMessage != null)
+                                if (message is CoreTweet.Streaming.StatusMessage sMessage)
                                 {
                                     Invoke((MethodInvoker)(() =>
                                     {
@@ -305,6 +330,11 @@ namespace StoneTank.Yukiusagi
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            foreach (var account in TwitterAccounts)
+            {
+                account.StopUserStream();
+            }
+
             notifyIcon.Visible = false;
 
             if (e.CloseReason != CloseReason.ApplicationExitCall)
@@ -324,12 +354,13 @@ namespace StoneTank.Yukiusagi
                 }
 
                 Settings.Default.SplitterDistance = splitContainer.SplitterDistance;
+                Settings.Default.TwitterAccounts = TwitterAccounts;
 
                 Settings.Default.TimelineProperties.Clear();
 
                 foreach (var item in dockPanel.Contents.Where(c => c is TimelineForm))
                 {
-                    Settings.Default.TimelineProperties.Add((item as TimelineForm).PersistString, (item as TimelineForm).TimelineProperty);
+                    Settings.Default.TimelineProperties.Add((item as TimelineForm).TimelineProperty);
                 }
 
                 // レイアウト情報を同じファイルにつっこむ

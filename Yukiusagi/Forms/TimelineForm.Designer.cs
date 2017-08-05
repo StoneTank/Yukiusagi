@@ -50,12 +50,12 @@
             this.tabContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.closeToolStripMenuItem});
             this.tabContextMenuStrip.Name = "tabContextMenuStrip";
-            this.tabContextMenuStrip.Size = new System.Drawing.Size(153, 48);
+            this.tabContextMenuStrip.Size = new System.Drawing.Size(123, 26);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             this.closeToolStripMenuItem.Text = "閉じる(&C)";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.CloseToolStripMenuItem_Click);
             // 
@@ -68,6 +68,7 @@
             this.ForeColor = System.Drawing.SystemColors.WindowText;
             this.Name = "TimelineForm";
             this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.Document;
+            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.TabPageContextMenuStrip = this.tabContextMenuStrip;
             this.Load += new System.EventHandler(this.TimelineForm_Load);

@@ -9,6 +9,9 @@ namespace StoneTank.Yukiusagi
     [Serializable]
     public class TimelineProperty
     {
+        /// <summary>Form の PersistString</summary>
+        public string FormPersistString { get; set; }
+        
         /// <summary>タイムラインのタブなどに表示されるテキスト</summary>
         public string Text { get; set; }
 

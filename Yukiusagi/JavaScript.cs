@@ -167,7 +167,7 @@ namespace StoneTank.Yukiusagi
 
             if (status != null && status.User != null && status.User.Id.HasValue)
             {
-                return TimelineProperty.AccountIds.IndexOf(Statuses.Find(s => s.Id == statusId).User.Id.Value) >= 0;
+                return TimelineProperty.AccountIds.Contains(status.User.Id.Value);
             }
             else
             {
@@ -180,9 +180,17 @@ namespace StoneTank.Yukiusagi
         {
             var status = Statuses.Find(s => s.Id == statusId);
 
-            if (status != null && status.InReplyToStatusId.HasValue)
+            if (status != null && status.ExtendedEntities != null && status.ExtendedEntities.UserMentions != null)
             {
-                return statusId == status.InReplyToStatusId.Value;
+                foreach (var item in status.ExtendedEntities.UserMentions)
+                {
+                    if (item.Id.HasValue && TimelineProperty.AccountIds.Contains(item.Id.Value))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
             else
             {

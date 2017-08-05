@@ -41,40 +41,47 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// TimelineForm を初期化します
         /// </summary>
-        public TimelineForm(TimelineProperty property = null)
+        public TimelineForm(TimelineProperty property)
         {
             InitializeComponent();
 
-            // PersistString が空の場合は決める
+            // PersistString を決める
+            TimelineProperty = property;
 
-            if (property != null && string.IsNullOrEmpty(PersistString))
+            // DockContent を区別するための文字列 ("0:TimelineForm" の形式)
+            PersistString = $"{Settings.Default.TabId}:{nameof(TimelineForm)}";
+            TimelineProperty.FormPersistString = PersistString;
+
+            if (Settings.Default.TabId == ulong.MaxValue)
             {
-                TimelineProperty = property;
-
-                // DockContent を区別するための文字列 ("0:TimelineForm" の形式)
-                PersistString = $"{Settings.Default.TabId}:{nameof(TimelineForm)}";
-
-                if (Settings.Default.TabId == ulong.MaxValue)
-                {
-                    Settings.Default.TabId = 0; // やむを得ない
-                }
-                else
-                {
-                    Settings.Default.TabId++;
-                }
+                Settings.Default.TabId = 0; // やむを得ない
             }
             else
             {
-                if (Settings.Default.TimelineProperties.ContainsKey(PersistString))
-                {
-                    TimelineProperty = Settings.Default.TimelineProperties[PersistString];
+                Settings.Default.TabId++;
+            }
 
-                    this.Text = this.TabText = TimelineProperty.Text;
-                }
-                else
-                {
-                    throw new TimelineSetupException();
-                }
+            JsFront = new JsFront(TimelineProperty);
+        }
+
+        /// <summary>
+        /// TimelineForm を初期化します
+        /// </summary>
+        public TimelineForm(string persistString)
+        {
+            InitializeComponent();
+
+            PersistString = persistString;
+
+            if (Settings.Default.TimelineProperties.Exists((p => p.FormPersistString == PersistString)))
+            {
+                TimelineProperty = Settings.Default.TimelineProperties.Find((p => p.FormPersistString == PersistString));
+
+                this.Text = this.TabText = TimelineProperty.Text;
+            }
+            else
+            {
+                throw new TimelineSetupException();
             }
 
             JsFront = new JsFront(TimelineProperty);
