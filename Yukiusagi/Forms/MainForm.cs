@@ -309,12 +309,12 @@ namespace StoneTank.Yukiusagi
                         "ゆきうさぎ", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                     Application.Exit();
                 }
-                //catch (Exception ex)
-                //{
-                //    MessageBox.Show("予期しないエラーのためアプリケーションの初期化に失敗しました。\r\n" + ex.Message,
-                //        "ゆきうさぎ", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                //    Application.Exit();
-                //}
+                catch (Exception ex)
+                {
+                    MessageBox.Show("予期しないエラーのためアプリケーションの初期化に失敗しました。\r\n" + ex.Message,
+                        "ゆきうさぎ", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                    Application.Exit();
+                }
                 finally
                 {
                     splash.Close();
