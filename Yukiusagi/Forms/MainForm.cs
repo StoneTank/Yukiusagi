@@ -146,6 +146,27 @@ namespace StoneTank.Yukiusagi
                                 await account.AuthorizeAsync(dialog.ConsumerKey, dialog.ConsumerSecret, this);
 
                                 TwitterAccounts.Add(account);
+
+                                // Home と Mentions を表示
+                                var homeTab = new TimelineForm()
+                                {
+                                    TimelineProperty = new TimelineProperty(TimelineType.Home, $"Home @{account.User.ScreenName}", account.User.Id.Value),
+                                    DockState = DockState.DockLeft,
+                                    Text = $"Home @{account.User.ScreenName}",
+                                    TabText = $"Home @{account.User.ScreenName}"
+                                };
+                                Settings.Default.TimelineProperties.Add(homeTab.PersistString, homeTab.TimelineProperty);
+                                homeTab.Show(dockPanel);
+
+                                var mentionsTab = new TimelineForm()
+                                {
+                                    TimelineProperty = new TimelineProperty(TimelineType.Mentions, $"Home @{account.User.ScreenName}", account.User.Id.Value),
+                                    DockState = DockState.DockRight,
+                                    Text = $"Home @{account.User.ScreenName}",
+                                    TabText = $"Home @{account.User.ScreenName}"
+                                };
+                                Settings.Default.TimelineProperties.Add(mentionsTab.PersistString, mentionsTab.TimelineProperty);
+                                mentionsTab.Show(dockPanel);
                             }
                             else
                             {
