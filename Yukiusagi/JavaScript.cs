@@ -16,7 +16,7 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// この JsFront をもつタイムラインが受信したステータスのリストです
         /// </summary>
-        public List<Status> Statuses { get; set; }
+        public List<Status> Statuses { get; set; } = new List<Status>();
 
         /// <summary>
         /// JsFront を初期化します
@@ -163,11 +163,11 @@ namespace StoneTank.Yukiusagi
         // Will be called from JavaScript
         public bool IsOwnTweet(long statusId)
         {
-            var userId = Statuses.Find(s => s.Id == statusId).User.Id;
+            var status = Statuses.Find(s => s.Id == statusId);
 
-            if (userId.HasValue)
+            if (status != null && status.User != null && status.User.Id.HasValue)
             {
-                return TimelineProperty.AccountIds.IndexOf(userId.Value) >= 0;
+                return TimelineProperty.AccountIds.IndexOf(Statuses.Find(s => s.Id == statusId).User.Id.Value) >= 0;
             }
             else
             {
@@ -178,11 +178,11 @@ namespace StoneTank.Yukiusagi
         // Will be called from JavaScript
         public bool IsReplyToMe(long statusId)
         {
-            var replyToStatusId = Statuses.Find(s => s.Id == statusId).InReplyToStatusId;
+            var status = Statuses.Find(s => s.Id == statusId);
 
-            if (replyToStatusId.HasValue)
+            if (status != null && status.InReplyToStatusId.HasValue)
             {
-                return statusId == replyToStatusId.Value;
+                return statusId == status.InReplyToStatusId.Value;
             }
             else
             {
@@ -195,11 +195,9 @@ namespace StoneTank.Yukiusagi
         {
             var status = Statuses.Find(s => s.Id == statusId);
 
-            var favorited = (status.RetweetedStatus ?? status).IsFavorited;
-
-            if (favorited.HasValue)
+            if (status != null && (status.RetweetedStatus ?? status).IsFavorited.HasValue)
             {
-                return favorited.Value;
+                return (status.RetweetedStatus ?? status).IsFavorited.Value;
             }
             else
             {
@@ -212,11 +210,9 @@ namespace StoneTank.Yukiusagi
         {
             var status = Statuses.Find(s => s.Id == statusId);
 
-            var retweeted = (status.RetweetedStatus ?? status).IsRetweeted;
-
-            if (retweeted.HasValue)
+            if (status != null && (status.RetweetedStatus ?? status).IsRetweeted.HasValue)
             {
-                return retweeted.Value;
+                return (status.RetweetedStatus ?? status).IsRetweeted.Value;
             }
             else
             {

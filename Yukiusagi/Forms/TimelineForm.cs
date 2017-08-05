@@ -41,14 +41,16 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// TimelineForm を初期化します
         /// </summary>
-        public TimelineForm()
+        public TimelineForm(TimelineProperty property = null)
         {
             InitializeComponent();
 
             // PersistString が空の場合は決める
 
-            if (string.IsNullOrEmpty(PersistString))
+            if (property != null && string.IsNullOrEmpty(PersistString))
             {
+                TimelineProperty = property;
+
                 // DockContent を区別するための文字列 ("0:TimelineForm" の形式)
                 PersistString = $"{Settings.Default.TabId}:{nameof(TimelineForm)}";
 
@@ -89,9 +91,9 @@ namespace StoneTank.Yukiusagi
             // JavaScript に投げる JSON
             string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(status));
 
-            if (!webBrowser.IsBusy)
+            if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
-                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusFunctionName"], new object[] { json });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusFunctionName"] as string, new object[] { json });
             }
         }
 
@@ -106,9 +108,9 @@ namespace StoneTank.Yukiusagi
             // JavaScript に投げる JSON
             string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(statuses));
 
-            if (!webBrowser.IsBusy)
+            if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
-                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusRangeFunctionName"], new object[] { json });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusRangeFunctionName"] as string, new object[] { json });
             }
         }
 
@@ -123,9 +125,9 @@ namespace StoneTank.Yukiusagi
                 JsFront.Statuses.RemoveAll(s => s.Id == id);
             }
 
-            if (!webBrowser.IsBusy)
+            if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
-                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["RemoveStatusFunctionName"], new object[] { id });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["RemoveStatusFunctionName"] as string, new object[] { id });
             }
         }
 

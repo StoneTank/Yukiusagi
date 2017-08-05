@@ -148,9 +148,8 @@ namespace StoneTank.Yukiusagi
                                 TwitterAccounts.Add(account);
 
                                 // Home と Mentions を表示
-                                var homeTab = new TimelineForm()
+                                var homeTab = new TimelineForm(new TimelineProperty(TimelineType.Home, $"Home @{account.User.ScreenName}", account.User.Id.Value))
                                 {
-                                    TimelineProperty = new TimelineProperty(TimelineType.Home, $"Home @{account.User.ScreenName}", account.User.Id.Value),
                                     Text = $"Home @{account.User.ScreenName}",
                                     TabText = $"Home @{account.User.ScreenName}"
                                 };
@@ -158,18 +157,17 @@ namespace StoneTank.Yukiusagi
                                 Settings.Default.TimelineProperties.Add(homeTab.PersistString, homeTab.TimelineProperty);
 
                                 homeTab.Show(dockPanel);
-                                homeTab.DockState = DockState.DockLeft;
+                                homeTab.DockState = DockState.Document;
 
-                                var mentionsTab = new TimelineForm()
-                                {
-                                    TimelineProperty = new TimelineProperty(TimelineType.Mentions, $"Home @{account.User.ScreenName}", account.User.Id.Value),                                    
+                                var mentionsTab = new TimelineForm(new TimelineProperty(TimelineType.Mentions, $"Home @{account.User.ScreenName}", account.User.Id.Value))
+                                {                              
                                     Text = $"Home @{account.User.ScreenName}",
                                     TabText = $"Home @{account.User.ScreenName}"
                                 };
                                 Settings.Default.TimelineProperties.Add(mentionsTab.PersistString, mentionsTab.TimelineProperty);
 
                                 mentionsTab.Show(dockPanel);
-                                mentionsTab.DockState = DockState.DockRight;
+                                mentionsTab.DockState = DockState.Document;
                             }
                             else
                             {
@@ -199,7 +197,7 @@ namespace StoneTank.Yukiusagi
                                 }));
 
                                 ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
-                                .NewStatusRange(home.OrderByDescending(s => s.Id).ToList());
+                                .NewStatusRange(home.OrderBy(s => s.Id).ToList());
 
                                 break;
                             case TimelineType.Mentions:
@@ -212,7 +210,7 @@ namespace StoneTank.Yukiusagi
                                 }));
 
                                 ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.Key)) as TimelineForm)
-                                .NewStatusRange(mentions.OrderByDescending(s => s.Id).ToList());
+                                .NewStatusRange(mentions.OrderBy(s => s.Id).ToList());
 
                                 break;
                             case TimelineType.User:
@@ -244,17 +242,33 @@ namespace StoneTank.Yukiusagi
                         {
                             if (message.Type == CoreTweet.Streaming.MessageType.Create)
                             {
-                                (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
-                                ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
-                                (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
-                                .NewStatus((message as CoreTweet.Streaming.StatusMessage).Status);
+                                var sMessage = message as CoreTweet.Streaming.StatusMessage;
+
+                                if (sMessage != null)
+                                {
+                                    Invoke((MethodInvoker)(() =>
+                                    {
+                                        (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
+                                        ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
+                                        (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
+                                        .NewStatus(sMessage.Status);
+                                    }));
+                                }
                             }
                             else if (message.Type == CoreTweet.Streaming.MessageType.DeleteStatus)
                             {
-                                (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
-                                ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
-                                (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
-                                .RemoveStatus((message as CoreTweet.Streaming.StatusMessage).Status.Id);
+                                var sMessage = message as CoreTweet.Streaming.StatusMessage;
+
+                                if (sMessage != null)
+                                {
+                                    Invoke((MethodInvoker)(() =>
+                                    {
+                                        (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
+                                        ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
+                                        (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
+                                        .RemoveStatus(sMessage.Status.Id);
+                                    }));
+                                }
                             }
                         };
                         account.StartUserStream();
