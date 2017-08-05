@@ -137,7 +137,7 @@ namespace StoneTank.Yukiusagi
             var baseUri = new Uri($"file:///{Application.StartupPath.Replace(Path.DirectorySeparatorChar, '/')}/");
             var uri = new Uri(baseUri, ConfigurationManager.AppSettings["TimelineHtmlUri"]);
 
-            if (File.Exists(uri.ToString()))
+            if (File.Exists(uri.LocalPath))
             {
                 webBrowser.Navigate(uri);
             }

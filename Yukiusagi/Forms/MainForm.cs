@@ -151,22 +151,25 @@ namespace StoneTank.Yukiusagi
                                 var homeTab = new TimelineForm()
                                 {
                                     TimelineProperty = new TimelineProperty(TimelineType.Home, $"Home @{account.User.ScreenName}", account.User.Id.Value),
-                                    DockState = DockState.DockLeft,
                                     Text = $"Home @{account.User.ScreenName}",
                                     TabText = $"Home @{account.User.ScreenName}"
                                 };
+
                                 Settings.Default.TimelineProperties.Add(homeTab.PersistString, homeTab.TimelineProperty);
+
                                 homeTab.Show(dockPanel);
+                                homeTab.DockState = DockState.DockLeft;
 
                                 var mentionsTab = new TimelineForm()
                                 {
-                                    TimelineProperty = new TimelineProperty(TimelineType.Mentions, $"Home @{account.User.ScreenName}", account.User.Id.Value),
-                                    DockState = DockState.DockRight,
+                                    TimelineProperty = new TimelineProperty(TimelineType.Mentions, $"Home @{account.User.ScreenName}", account.User.Id.Value),                                    
                                     Text = $"Home @{account.User.ScreenName}",
                                     TabText = $"Home @{account.User.ScreenName}"
                                 };
                                 Settings.Default.TimelineProperties.Add(mentionsTab.PersistString, mentionsTab.TimelineProperty);
+
                                 mentionsTab.Show(dockPanel);
+                                mentionsTab.DockState = DockState.DockRight;
                             }
                             else
                             {
@@ -267,12 +270,12 @@ namespace StoneTank.Yukiusagi
                         "ゆきうさぎ", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                     Application.Exit();
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("予期しないエラーのためアプリケーションの初期化に失敗しました。\r\n" + ex.Message,
-                        "ゆきうさぎ", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                    Application.Exit();
-                }
+                //catch (Exception ex)
+                //{
+                //    MessageBox.Show("予期しないエラーのためアプリケーションの初期化に失敗しました。\r\n" + ex.Message,
+                //        "ゆきうさぎ", MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                //    Application.Exit();
+                //}
                 finally
                 {
                     splash.Close();

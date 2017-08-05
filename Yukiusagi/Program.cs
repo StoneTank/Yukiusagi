@@ -52,7 +52,7 @@ namespace StoneTank.Yukiusagi
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TimelineForm());
+            Application.Run(new MainForm());
         }
 
     }
