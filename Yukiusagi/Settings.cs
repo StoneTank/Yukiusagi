@@ -42,5 +42,16 @@ namespace StoneTank.Yukiusagi.Properties
             get { return (List<TwitterAccount>)(this["TwitterAccounts"]); }
             set { this["TwitterAccounts"] = value; }
         }
+
+        /// <summary>
+        /// タイムライン設定
+        /// </summary>
+        [UserScopedSetting()]
+        [DefaultSettingValue("")]
+        public List<TimelineProperty> TimelineProperties
+        {
+            get { return (List<TimelineProperty>)(this["TimelineProperties"]); }
+            set { this["TimelineProperties"] = value; }
+        }
     }
 }

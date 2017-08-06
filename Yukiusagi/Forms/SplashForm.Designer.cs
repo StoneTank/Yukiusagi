@@ -40,9 +40,9 @@
             // smallLabel
             // 
             this.smallLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.smallLabel.Location = new System.Drawing.Point(0, 62);
+            this.smallLabel.Location = new System.Drawing.Point(0, 86);
             this.smallLabel.Name = "smallLabel";
-            this.smallLabel.Size = new System.Drawing.Size(318, 24);
+            this.smallLabel.Size = new System.Drawing.Size(318, 32);
             this.smallLabel.TabIndex = 1;
             this.smallLabel.Text = "Version 0.0.0.0";
             this.smallLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -52,8 +52,8 @@
             this.panel.BackColor = System.Drawing.Color.Transparent;
             this.panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel.Controls.Add(this.titleLabel);
-            this.panel.Controls.Add(this.smallLabel);
             this.panel.Controls.Add(this.pictureBox);
+            this.panel.Controls.Add(this.smallLabel);
             this.panel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel.Location = new System.Drawing.Point(0, 0);
             this.panel.Name = "panel";
@@ -66,7 +66,7 @@
             this.titleLabel.Font = new System.Drawing.Font("Meiryo UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.titleLabel.Location = new System.Drawing.Point(0, 0);
             this.titleLabel.Name = "titleLabel";
-            this.titleLabel.Size = new System.Drawing.Size(318, 62);
+            this.titleLabel.Size = new System.Drawing.Size(318, 64);
             this.titleLabel.TabIndex = 0;
             this.titleLabel.Text = "Title";
             this.titleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -77,10 +77,10 @@
             this.pictureBox.ErrorImage = null;
             this.pictureBox.Image = global::StoneTank.Yukiusagi.Properties.Resources.Loading;
             this.pictureBox.InitialImage = null;
-            this.pictureBox.Location = new System.Drawing.Point(0, 86);
+            this.pictureBox.Location = new System.Drawing.Point(0, 64);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(318, 32);
-            this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox.Size = new System.Drawing.Size(318, 22);
+            this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox.TabIndex = 2;
             this.pictureBox.TabStop = false;
             // 
