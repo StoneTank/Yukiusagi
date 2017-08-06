@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CoreTweet;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace StoneTank.Yukiusagi
@@ -6,6 +8,24 @@ namespace StoneTank.Yukiusagi
     [ComVisible(true)]
     public class JsFront
     {
+        /// <summary>
+        /// タイムラインのプロパティ
+        /// </summary>
+        public TimelineProperty TimelineProperty { get; set; }
+
+        /// <summary>
+        /// この JsFront をもつタイムラインが受信したステータスのリストです
+        /// </summary>
+        public List<Status> Statuses { get; set; } = new List<Status>();
+
+        /// <summary>
+        /// JsFront を初期化します
+        /// </summary>
+        public JsFront(TimelineProperty property)
+        {
+            TimelineProperty = property;
+        }
+
         /// <summary>
         /// JavaScript 側で window.external.Favorite(...) が呼び出された時に発生します。
         /// </summary>
@@ -140,28 +160,72 @@ namespace StoneTank.Yukiusagi
             OnSearchCalled(new SearchCalledEventArgs(keyword));
         }
 
+        // Will be called from JavaScript
         public bool IsOwnTweet(long statusId)
         {
-            // Not Implemented
-            return false;
+            var status = Statuses.Find(s => s.Id == statusId);
+
+            if (status != null && status.User != null && status.User.Id.HasValue)
+            {
+                return TimelineProperty.AccountIds.Contains(status.User.Id.Value);
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        // Will be called from JavaScript
         public bool IsReplyToMe(long statusId)
         {
-            // Not Implemented
-            return false;
+            var status = Statuses.Find(s => s.Id == statusId);
+
+            if (status != null && status.ExtendedEntities != null && status.ExtendedEntities.UserMentions != null)
+            {
+                foreach (var item in status.ExtendedEntities.UserMentions)
+                {
+                    if (item.Id.HasValue && TimelineProperty.AccountIds.Contains(item.Id.Value))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        // Will be called from JavaScript
         public bool IsFavorited(long statusId)
         {
-            // Not Implemented
-            return false;
+            var status = Statuses.Find(s => s.Id == statusId);
+
+            if (status != null && (status.RetweetedStatus ?? status).IsFavorited.HasValue)
+            {
+                return (status.RetweetedStatus ?? status).IsFavorited.Value;
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        // Will be called from JavaScript
         public bool IsRetweeted(long statusId)
         {
-            // Not Implemented
-            return false;
+            var status = Statuses.Find(s => s.Id == statusId);
+
+            if (status != null && (status.RetweetedStatus ?? status).IsRetweeted.HasValue)
+            {
+                return (status.RetweetedStatus ?? status).IsRetweeted.Value;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 

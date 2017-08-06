@@ -34,6 +34,16 @@
         setTimeout(callback, 0);
       }
 
+      // 指定されたIDのステータスを表示から削除します
+      function removeStatus(id)
+      {
+        var callback = function() {
+          $("#" + id).remove();
+        };
+
+        setTimeout(callback, 0);
+      }
+
       // 指定されたIDのステータスを削除するよう要求します
       function destroy(id)
       {
@@ -51,7 +61,7 @@
 
         var callback;
 
-        if (window.external.IsFavorited)
+        if (window.external.IsFavorited(id))
         {
           // unfav
           callback = function() {
@@ -133,8 +143,8 @@
         }
 
         // ボタン用HTML
-        var destroyButtonHtml = window.external.IsOwnTweet(status.id) ? '' :
-          '\<a href="#"\>\<img class="destroyButton" src="../Resources/Destroy.png" onclick="destroy(' + status.id + ');"\>\</a\>';
+        var destroyButtonHtml = window.external.IsOwnTweet(status.id) ?
+          '\<a href="#"\>\<img class="destroyButton" src="../Resources/Destroy.png" onclick="destroy(' + status.id + ');"\>\</a\>' : '';
 
         var stealButtonHtml = window.external.IsOwnTweet(status.id) ? '' : '\<a href="#"\>\<img class="stealButton" src="../Resources/Steal.png" onclick="steal(' + status.id + ');"\>\</a\>';
         
