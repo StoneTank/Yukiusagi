@@ -153,7 +153,6 @@ namespace StoneTank.Yukiusagi
                                     Text = $"Home @{account.User.ScreenName}",
                                     TabText = $"Home @{account.User.ScreenName}"
                                 };
-
                                 Settings.Default.TimelineProperties.Add(homeTab.TimelineProperty);
 
                                 homeTab.Show(dockPanel);
@@ -193,7 +192,7 @@ namespace StoneTank.Yukiusagi
                                 await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
                                     home.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.HomeTimelineAsync(
-                                        count => Settings.Default.StatusesCount, exclude_replies => true));
+                                        count => Settings.Default.StatusesCount, tweet_mode => "extended", exclude_replies => true));
                                 }));
 
                                 ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
@@ -206,7 +205,7 @@ namespace StoneTank.Yukiusagi
                                 await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
                                     mentions.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.MentionsTimelineAsync(
-                                        count => Settings.Default.StatusesCount));
+                                        count => Settings.Default.StatusesCount, tweet_mode => "extended"));
                                 }));
 
                                 ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
@@ -218,7 +217,7 @@ namespace StoneTank.Yukiusagi
                                 {
                                     ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
                                     .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Statuses.UserTimelineAsync(
-                                        count => Settings.Default.StatusesCount, user_id => p.UserId)).OrderByDescending(s => s.Id).ToList());
+                                        count => Settings.Default.StatusesCount, tweet_mode => "extended", user_id => p.UserId)).OrderByDescending(s => s.Id).ToList());
                                 }));
                                 break;
                             case TimelineType.Search:
@@ -226,7 +225,7 @@ namespace StoneTank.Yukiusagi
                                 {
                                     ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
                                     .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Search.TweetsAsync(
-                                        count => Settings.Default.StatusesCount, q => p.SearchKeyword)).OrderByDescending(s => s.Id).ToList());
+                                        count => Settings.Default.StatusesCount, tweet_mode => "extended", q => p.SearchKeyword)).OrderByDescending(s => s.Id).ToList());
                                 }));
                                 break;
                             default:
