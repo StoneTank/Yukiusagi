@@ -160,7 +160,7 @@
 
         // 本文
         var displayStatus = status.retweeted_status != null ? status.retweeted_status : status;
-        var detailHtml = displayStatus.full_text != null ? displayStatus.full_text : displayStatus.text;
+        var detailHtml = (displayStatus.full_text != null ? displayStatus.full_text : displayStatus.text).replace(/\n/g, "\<br\>");
 
         // 本文: Entities
         if (displayStatus.entities != null)
