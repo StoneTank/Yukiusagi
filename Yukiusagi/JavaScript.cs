@@ -180,9 +180,9 @@ namespace StoneTank.Yukiusagi
         {
             var status = Statuses.Find(s => s.Id == statusId);
 
-            if (status != null && status.ExtendedEntities != null && status.ExtendedEntities.UserMentions != null)
+            if (status != null && status.Entities != null && status.Entities.UserMentions != null)
             {
-                foreach (var item in status.ExtendedEntities.UserMentions)
+                foreach (var item in status.Entities.UserMentions)
                 {
                     if (item.Id.HasValue && TimelineProperty.AccountIds.Contains(item.Id.Value))
                     {
