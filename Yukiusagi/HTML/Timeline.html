@@ -233,7 +233,7 @@
           ' via ' + displayStatus.source;
 
         // これらの値をくっつける
-        element.innerHTML = '\<div class="header"\>\<div\>' + userHtml + '\</div\>\<div\>' +
+        element.innerHTML = '\<div class="header"\>\<div class="user"\>' + userHtml + '\</div\>\<div\>' +
           destroyButtonHtml + stealButtonHtml + favRtButtonHtml + rtButtonHtml + favButtonHtml + replyButtonHtml +
           '\</div\>\</div\>\<div class="detail"\>' + detailHtml + mediaHtml +
           '\</div\>\<div class="footer"\>' + footerHtml + '\</div\>';
@@ -285,6 +285,12 @@
       }
       .header img {
         height: 22px;
+      }
+      .header .user {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: calc(100% - (22px * 6));
       }
 
       .detail img, .detail video {
