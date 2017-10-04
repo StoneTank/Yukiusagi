@@ -233,7 +233,7 @@
 
             $.each(displayStatus.entities.hashtags, function(index, value) {
               var replacement = "#" + getCharacterReferences(value.text);
-              detailHtml = detailHtml.replace(new RegExp('(#' + value.text + ')', 'g'), '\<a href="#" onclick="window.external.Search(\'' + replacement + '\');"\>' + replacement + '\</a\>');window.alert(detailHtml);
+              detailHtml = detailHtml.replace(new RegExp('(#' + value.text + ')', 'g'), '\<a href="#" onclick="window.external.Search(\'' + replacement + '\');"\>' + replacement + '\</a\>');
             });
           }
 
