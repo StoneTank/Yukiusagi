@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -96,7 +97,7 @@ namespace StoneTank.Yukiusagi
             JsFront.Statuses.Add(status);
 
             // JavaScript に投げる JSON
-            string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(status));
+            string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(new JsStatus(status)));
 
             if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
@@ -113,7 +114,8 @@ namespace StoneTank.Yukiusagi
             JsFront.Statuses.AddRange(statuses);
 
             // JavaScript に投げる JSON
-            string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(statuses));
+            List<JsStatus> list = statuses.Select(status => new JsStatus(status)).ToList();
+            string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(list));
 
             if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
@@ -134,7 +136,7 @@ namespace StoneTank.Yukiusagi
 
             if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
-                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["RemoveStatusFunctionName"] as string, new object[] { id });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["RemoveStatusFunctionName"] as string, new object[] { id.ToString() });
             }
         }
 
