@@ -171,17 +171,17 @@
         var element = document.createElement("li");
         
         // ステータス ID
-        element.setAttribute("id", status.id);
+        element.setAttribute("id", status.id_str);
 
         if (status.retweeted_status != null) {
           // リツイート
           element.setAttribute("class", "rt");
         }
-        else if (window.external.IsReplyToMe(status.id)) {
+        else if (window.external.IsReplyToMe(status.id_str)) {
           // リプライ
           element.setAttribute("class", "reply");
         }
-        else if (window.external.IsOwnTweet(status.id)) {
+        else if (window.external.IsOwnTweet(status.id_str)) {
           // 自分のツイート
           element.setAttribute("class", "own");
         }
@@ -194,29 +194,29 @@
         var userHtml;
         if (status.retweeted_status != null) {
           // 名前 @screen_name (Retweeted by @screen_name)
-          userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.retweeted_status.user.id + ');"\>' + status.retweeted_status.user.name + ' @' + status.retweeted_status.user.screen_name +
-          '\</a\> (Retweeted by \<a href="#" onclick="window.external.ShowUser(' + status.user.id + ');"\>@' + status.user.screen_name + '\</a\>)';
+          userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.retweeted_status.user.id_str + ');"\>' + status.retweeted_status.user.name + ' @' + status.retweeted_status.user.screen_name +
+          '\</a\> (Retweeted by \<a href="#" onclick="window.external.ShowUser(' + status.user.id_str + ');"\>@' + status.user.screen_name + '\</a\>)';
         }
         else {
           // 名前 @screen_name
-          userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.user.id + ');"\>' + status.user.name + ' @' + status.user.screen_name + '\</a\>';
+          userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.user.id_str + ');"\>' + status.user.name + ' @' + status.user.screen_name + '\</a\>';
         }
 
         // ボタン用HTML
-        var destroyButtonHtml = window.external.IsOwnTweet(status.id) ?
-          '\<a href="#"\>\<img class="destroyButton" src="../Resources/Destroy.png" onclick="destroy(' + status.id + ');"\>\</a\>' : '';
+        var destroyButtonHtml = window.external.IsOwnTweet(status.id_str) ?
+          '\<a href="#"\>\<img class="destroyButton" src="../Resources/Destroy.png" onclick="destroy(' + status.id_str + ');"\>\</a\>' : '';
 
-        var stealButtonHtml = window.external.IsOwnTweet(status.id) ? '' : '\<a href="#"\>\<img class="stealButton" src="../Resources/Steal.png" onclick="steal(' + status.id + ');"\>\</a\>';
+        var stealButtonHtml = window.external.IsOwnTweet(status.id_str) ? '' : '\<a href="#"\>\<img class="stealButton" src="../Resources/Steal.png" onclick="steal(' + status.id_str + ');"\>\</a\>';
         
         var favRtButtonHtml = (status.retweeted_status != null || !status.user.protected) ?
-          '\<a href="#"\>\<img class="favRtButton" src="../Resources/FavRt.png" onclick="favorite(' + status.id + '); retweet(' + status.id + ');"\>\</a\>' : '';
+          '\<a href="#"\>\<img class="favRtButton" src="../Resources/FavRt.png" onclick="favorite(' + status.id_str + '); retweet(' + status.id_str + ');"\>\</a\>' : '';
 
         var rtButtonHtml = (status.retweeted_status != null || !status.user.protected) ?
-          '\<a href="#"\>\<img class="rtButton" src="../Resources/' + (status.retweeted ? 'RtActive.png' : 'Rt.png') + '" onclick="retweet(' + status.id + ');"\>\</a\>' : '';
+          '\<a href="#"\>\<img class="rtButton" src="../Resources/' + (status.retweeted ? 'RtActive.png' : 'Rt.png') + '" onclick="retweet(' + status.id_str + ');"\>\</a\>' : '';
 
-        var favButtonHtml = '\<a href="#"\>\<img class="favButton" src="../Resources/' + (status.favorited ? 'FavActive.png' : 'Fav.png') + '" onclick="favorite(' + status.id + ');"\>\</a\>';
+        var favButtonHtml = '\<a href="#"\>\<img class="favButton" src="../Resources/' + (status.favorited ? 'FavActive.png' : 'Fav.png') + '" onclick="favorite(' + status.id_str + ');"\>\</a\>';
         
-        var replyButtonHtml = '\<a href="#"\>\<img src="../Resources/Reply.png" onclick="window.external.Reply(' + status.id + ', \'\');"\>\</a\>';
+        var replyButtonHtml = '\<a href="#"\>\<img src="../Resources/Reply.png" onclick="window.external.Reply(' + status.id_str + ', \'\');"\>\</a\>';
 
         // 本文
         var displayStatus = status.retweeted_status != null ? status.retweeted_status : status;
