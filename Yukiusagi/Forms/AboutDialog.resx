@@ -140,7 +140,7 @@ Copyright (c) .NET Foundation and Contributors
 All Rights Reserved
 http://go.microsoft.com/fwlink/?LinkID=261272
 
-このソフトウェアに付属するHTMLが使用しているライブラリのライセンスについては以下を参照してください:
+このソフトウェアに付属するHTMLが使用しているライブラリ、およびHTMLに含まれるコードのライセンスについては以下を参照してください:
 
 jQuery
 Copyright JS Foundation and other contributors, https://js.foundation/
@@ -152,7 +152,11 @@ https://github.com/moment/moment/blob/master/LICENSE
 
 Moment Timezone
 Copyright (c) JS Foundation and other contributors
-https://github.com/moment/moment-timezone/blob/master/LICENSE</value>
+https://github.com/moment/moment-timezone/blob/master/LICENSE
+
+String.prototype.codePointAt
+Copyright Mathias Bynens &lt;https://mathiasbynens.be/&gt;
+https://github.com/mathiasbynens/String.prototype.codePointAt/blob/master/LICENSE-MIT.txt</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

@@ -138,7 +138,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutDialog";
-            this.Padding = new System.Windows.Forms.Padding(20, 20, 20, 20);
+            this.Padding = new System.Windows.Forms.Padding(20);
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "バージョン情報";
