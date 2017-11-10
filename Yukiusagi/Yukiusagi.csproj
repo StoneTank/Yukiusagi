@@ -275,13 +275,13 @@
     <Major>3</Major>
     <Minor>0</Minor>
     <Build>0</Build>
-    <Revision>756</Revision>
+    <Revision>860</Revision>
   </PropertyGroup>
   <Target Name="Version">
     <GitVersion LocalPath="$(MSBuildProjectDirectory)">
       <Output TaskParameter="CommitHash" PropertyName="CommitHash" />
     </GitVersion>
-    <AssemblyInfo CodeLanguage="CS" OutputFile="Properties\AssemblyInfo.cs" AssemblyTitle="ゆきうさぎ" AssemblyDescription="ゆきうさぎ" AssemblyConfiguration="" AssemblyCompany="StoneTank" AssemblyProduct="ゆきうさぎ" AssemblyCopyright="Copyright © 2016-2017 StoneTank" AssemblyTrademark="" AssemblyCulture="" ComVisible="false" Guid="eb116341-e47a-417d-96d4-a132d4da7ab0" AssemblyInformationalVersion="$(Major).$(Minor).$(Build).$(Revision) ($(CommitHash))" AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)" AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)" />
+    <AssemblyInfo CodeLanguage="CS" OutputFile="Properties\AssemblyInfo.cs" AssemblyTitle="ゆきうさぎ" AssemblyDescription="ゆきうさぎ" AssemblyConfiguration="" AssemblyCompany="StoneTank" AssemblyProduct="ゆきうさぎ" AssemblyCopyright="Copyright © 2016 StoneTank" AssemblyTrademark="" AssemblyCulture="" ComVisible="false" Guid="eb116341-e47a-417d-96d4-a132d4da7ab0" AssemblyInformationalVersion="$(Major).$(Minor).$(Build).$(Revision) ($(CommitHash))" AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)" AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
