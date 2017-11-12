@@ -118,8 +118,8 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LicenseTextBox.Text" xml:space="preserve">
-    <value>このソフトウェアは The MIT License によりライセンスされています:
-https://stonetank.com/yukiusagi/license.html
+    <value>このソフトウェアは MIT License によりライセンスされています:
+https://github.com/stonetank/Yukiusagi/blob/master/LICENSE
 
 このソフトウェアが使用しているライブラリのライセンスについては以下を参照してください:
 
@@ -138,7 +138,25 @@ https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md
 Reactive Extensions
 Copyright (c) .NET Foundation and Contributors
 All Rights Reserved
-http://go.microsoft.com/fwlink/?LinkID=261272</value>
+http://go.microsoft.com/fwlink/?LinkID=261272
+
+このソフトウェアに付属するHTMLが使用しているライブラリ、およびHTMLに含まれるコードのライセンスについては以下を参照してください:
+
+jQuery
+Copyright JS Foundation and other contributors, https://js.foundation/
+https://github.com/jquery/jquery/blob/master/LICENSE.txt
+
+Moment.js
+Copyright (c) JS Foundation and other contributors
+https://github.com/moment/moment/blob/master/LICENSE
+
+Moment Timezone
+Copyright (c) JS Foundation and other contributors
+https://github.com/moment/moment-timezone/blob/master/LICENSE
+
+String.prototype.codePointAt
+Copyright Mathias Bynens &lt;https://mathiasbynens.be/&gt;
+https://github.com/mathiasbynens/String.prototype.codePointAt/blob/master/LICENSE-MIT.txt</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
