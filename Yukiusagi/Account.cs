@@ -1,8 +1,6 @@
 ﻿using CoreTweet;
-using CoreTweet.Streaming;
 using System;
 using System.Diagnostics;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
@@ -15,14 +13,11 @@ namespace StoneTank.Yukiusagi
     [Serializable]
     public class TwitterAccount
     {
-        private Tokens tokens;
-        private User user;
+        [XmlIgnore]
+        public Tokens Tokens { get; private set; }
 
         [XmlIgnore]
-        public Tokens Tokens { get => tokens; }
-
-        [XmlIgnore]
-        public User User { get => user; }
+        public User User { get; private set; }
 
         public TwitterAccountData AccountData { get; set; }
 
@@ -53,7 +48,7 @@ namespace StoneTank.Yukiusagi
             {
                 throw new ArgumentNullException();
             }
-            else if (tokens != null && user != null)
+            else if (Tokens != null && User != null)
             {
                 throw new InvalidOperationException("既に認証されています。");
             }
@@ -68,24 +63,24 @@ namespace StoneTank.Yukiusagi
 
                     if (result == DialogResult.OK)
                     {
-                        tokens = await OAuth.GetTokensAsync(oAuthSession, dialog.Pin);
-                        user = await tokens.Account.VerifyCredentialsAsync();
+                        Tokens = await OAuth.GetTokensAsync(oAuthSession, dialog.Pin);
+                        User = await Tokens.Account.VerifyCredentialsAsync();
 
-                        if (user == null)
+                        if (User == null)
                         {
                             throw new AuthorizationFailedException("ユーザ認証処理で不明なエラーが発生しました。");
                         }
                         else
                         {
                             // 短縮URLの文字数確認用
-                            Configurations config = await tokens.Help.ConfigurationAsync();
+                            Configurations config = await Tokens.Help.ConfigurationAsync();
 
                             AccountData = new TwitterAccountData()
                             {
-                                ConsumerKey = tokens.ConsumerKey,
-                                ConsumerSecret = tokens.ConsumerSecret,
-                                AccessToken = tokens.AccessToken,
-                                AccessSecret = tokens.AccessTokenSecret,
+                                ConsumerKey = Tokens.ConsumerKey,
+                                ConsumerSecret = Tokens.ConsumerSecret,
+                                AccessToken = Tokens.AccessToken,
+                                AccessSecret = Tokens.AccessTokenSecret,
 
                                 MediaPossiblySensitive = false,
                                 ShortUrlLength = config.ShortUrlLength,
@@ -113,16 +108,16 @@ namespace StoneTank.Yukiusagi
             {
                 throw new InvalidOperationException("AccountData を設定してから実行してください");
             }
-            else if (tokens != null && user != null)
+            else if (Tokens != null && User != null)
             {
                 throw new InvalidOperationException("既に認証されています");
             }
             else
             {
-                tokens = Tokens.Create(AccountData.ConsumerKey, AccountData.ConsumerSecret, AccountData.AccessToken, AccountData.AccessSecret);
-                user = await tokens.Account.VerifyCredentialsAsync();
+                Tokens = Tokens.Create(AccountData.ConsumerKey, AccountData.ConsumerSecret, AccountData.AccessToken, AccountData.AccessSecret);
+                User = await Tokens.Account.VerifyCredentialsAsync();
 
-                if (user == null)
+                if (User == null)
                 {
                     throw new AuthorizationFailedException("ユーザ認証処理で不明なエラーが発生しました。");
                 }
@@ -131,7 +126,7 @@ namespace StoneTank.Yukiusagi
                     // 前回の確認から1日以上経過している場合は短縮URLの文字数を確認する
                     if (DateTime.Now.Subtract(AccountData.ConfigUpdatedAt) >= new TimeSpan(1, 0, 0, 0))
                     {
-                        Configurations config = await tokens.Help.ConfigurationAsync();
+                        Configurations config = await Tokens.Help.ConfigurationAsync();
 
                         AccountData = new TwitterAccountData()
                         {
@@ -150,74 +145,6 @@ namespace StoneTank.Yukiusagi
             }
         }
         
-        #endregion
-
-        #region Streaming API
-
-        /// <summary>
-        /// StartUserStream() で開始した User Stream 接続の IDisposable です。。
-        /// </summary>
-        private IDisposable userStreamIDisposable;
-
-        /// <summary>
-        /// User Stream 接続を開始します。
-        /// </summary>
-        public void StartUserStream()
-        {
-            var stream = Tokens.Streaming.UserAsObservable().Publish();
-            
-            stream.Subscribe(
-                (StreamingMessage message) =>
-                {
-                    OnStreamingMessageReceicved(message);
-                },
-                (Exception ex) =>
-                {
-                    if (userStreamIDisposable != null)
-                    {
-                        userStreamIDisposable.Dispose();
-                        userStreamIDisposable = null;
-                    }
-
-                    throw new StreamDisconnectedException("予期せず User Stream 接続が終了しました", ex);
-                },
-                () =>
-                {
-                    if (userStreamIDisposable != null)
-                    {
-                        userStreamIDisposable.Dispose();
-                        userStreamIDisposable = null;
-                    }
-
-                    throw new StreamDisconnectedException("予期せず User Stream 接続が終了しました");
-                }
-            );
-
-            userStreamIDisposable = stream.Connect();
-        }
-
-        /// <summary>
-        /// Stop user stream if active
-        /// </summary>
-        public void StopUserStream()
-        {
-            if (userStreamIDisposable != null)
-            {
-                userStreamIDisposable.Dispose();
-                userStreamIDisposable = null;
-            }
-        }
-
-        /// <summary>
-        /// Streaming message を受信したときに発生します。
-        /// </summary>
-        public event EventHandler<StreamingMessage> StreamingMessageReceived;
-        
-        protected virtual void OnStreamingMessageReceicved(StreamingMessage message)
-        {
-            StreamingMessageReceived?.Invoke(this, message);
-        }
-
         #endregion
 
     }
@@ -248,13 +175,6 @@ namespace StoneTank.Yukiusagi
         public AuthorizationFailedException() { }
         public AuthorizationFailedException(string message) : base(message) { }
         public AuthorizationFailedException(string message, Exception innerException) : base(message, innerException) { }
-    }
-
-    public class StreamDisconnectedException : Exception
-    {
-        public StreamDisconnectedException() { }
-        public StreamDisconnectedException(string message) : base(message) { }
-        public StreamDisconnectedException(string message, Exception innerException) : base(message, innerException) { }
     }
 
     #endregion

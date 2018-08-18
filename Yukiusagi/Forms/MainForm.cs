@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.NetworkInformation;
-using System.Reactive.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -232,71 +231,6 @@ namespace StoneTank.Yukiusagi
                                 break;
                         }
                     }));
-
-                    // User Stream
-
-                    foreach (var account in TwitterAccounts)
-                    {
-                        account.StreamingMessageReceived += (s, message) =>
-                        {
-                            if (message.Type == CoreTweet.Streaming.MessageType.Create)
-                            {
-                                if (message is CoreTweet.Streaming.StatusMessage sMessage)
-                                {
-                                    Invoke((MethodInvoker)(() =>
-                                    {
-                                        foreach (var dockContent in (dockPanel.Contents.Where(c => c is TimelineForm)
-                                            .Where(c =>
-                                                ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
-                                                (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)
-                                            )))
-                                        {
-                                            // Home
-                                            if ((dockContent as TimelineForm).TimelineProperty.Type == TimelineType.Home &&
-                                            (dockContent as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value))
-                                            {
-                                                (dockContent as TimelineForm).NewStatus(sMessage.Status);
-                                            }
-
-                                            // Mentions
-                                            if ((dockContent as TimelineForm).TimelineProperty.Type == TimelineType.Mentions &&
-                                            sMessage.Status.ExtendedEntities != null && sMessage.Status.ExtendedEntities.UserMentions != null)
-                                            {
-                                                var isReplyToMe = false;
-
-                                                foreach (var item in sMessage.Status.ExtendedEntities.UserMentions)
-                                                {
-                                                    if (item.Id.HasValue && (dockContent as TimelineForm).TimelineProperty.AccountIds.Contains(item.Id.Value))
-                                                    {
-                                                        isReplyToMe = true;
-                                                    }
-                                                }
-
-                                                if (isReplyToMe)
-                                                {
-                                                    (dockContent as TimelineForm).NewStatus(sMessage.Status);
-                                                }
-                                            }
-                                        }
-                                    }));
-                                }
-                            }
-                            else if (message.Type == CoreTweet.Streaming.MessageType.DeleteStatus)
-                            {
-                                if (message is CoreTweet.Streaming.StatusMessage sMessage)
-                                {
-                                    Invoke((MethodInvoker)(() =>
-                                    {
-                                        (dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c =>
-                                        ((c as TimelineForm).TimelineProperty.Type == TimelineType.Home || (c as TimelineForm).TimelineProperty.Type == TimelineType.Mentions) &&
-                                        (c as TimelineForm).TimelineProperty.AccountIds.Contains(account.User.Id.Value)) as TimelineForm)
-                                        .RemoveStatus(sMessage.Status.Id);
-                                    }));
-                                }
-                            }
-                        };
-                        account.StartUserStream();
-                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -329,11 +263,6 @@ namespace StoneTank.Yukiusagi
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            foreach (var account in TwitterAccounts)
-            {
-                account.StopUserStream();
-            }
-
             notifyIcon.Visible = false;
 
             if (e.CloseReason != CloseReason.ApplicationExitCall)
