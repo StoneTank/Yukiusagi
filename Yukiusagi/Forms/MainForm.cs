@@ -1,4 +1,5 @@
 ﻿using CoreTweet;
+using CoreTweet.Core;
 using StoneTank.Yukiusagi.Properties;
 using System;
 using System.Collections.Generic;
@@ -186,29 +187,29 @@ namespace StoneTank.Yukiusagi
                         switch (p.Type)
                         {
                             case TimelineType.Home:
-                                var home = new List<Status>();
+                                var home = new List<ListedResponse<Status>>();
 
                                 await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
-                                    home.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.HomeTimelineAsync(
+                                    home.Add(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.HomeTimelineAsync(
                                         count => Settings.Default.StatusesCount, tweet_mode => "extended", exclude_replies => true));
                                 }));
 
                                 ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
-                                .NewStatusRange(home.OrderBy(s => s.Id).ToList());
+                                .NewStatusRangeFromMultipleLists(home.ToArray());
 
                                 break;
                             case TimelineType.Mentions:
-                                var mentions = new List<Status>();
+                                var mentions = new List<ListedResponse<Status>>();
 
                                 await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
-                                    mentions.AddRange(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.MentionsTimelineAsync(
+                                    mentions.Add(await TwitterAccounts.Where(a => a.User.Id == id).FirstOrDefault().Tokens.Statuses.MentionsTimelineAsync(
                                         count => Settings.Default.StatusesCount, tweet_mode => "extended"));
                                 }));
 
                                 ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
-                                .NewStatusRange(mentions.OrderBy(s => s.Id).ToList());
+                                .NewStatusRangeFromMultipleLists(mentions.ToArray());
 
                                 break;
                             case TimelineType.User:
@@ -216,15 +217,17 @@ namespace StoneTank.Yukiusagi
                                 {
                                     ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
                                     .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Statuses.UserTimelineAsync(
-                                        count => Settings.Default.StatusesCount, tweet_mode => "extended", user_id => p.UserId)).OrderByDescending(s => s.Id).ToList());
+                                        count => Settings.Default.StatusesCount, tweet_mode => "extended", user_id => p.UserId)));
                                 }));
                                 break;
                             case TimelineType.Search:
                                 await Task.WhenAll(p.AccountIds.Select(async id =>
                                 {
+                                    var searchResult = await TwitterAccounts.FirstOrDefault().Tokens.Search.TweetsAsync(
+                                        count => Settings.Default.StatusesCount, tweet_mode => "extended", q => p.SearchKeyword);
+
                                     ((dockPanel.Contents.Where(c => c is TimelineForm).FirstOrDefault(c => (c as TimelineForm).PersistString == p.FormPersistString)) as TimelineForm)
-                                    .NewStatusRange((await TwitterAccounts.FirstOrDefault().Tokens.Search.TweetsAsync(
-                                        count => Settings.Default.StatusesCount, tweet_mode => "extended", q => p.SearchKeyword)).OrderByDescending(s => s.Id).ToList());
+                                    .NewStatusRange(searchResult, searchResult.Json);
                                 }));
                                 break;
                             default:
