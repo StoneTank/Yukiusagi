@@ -107,7 +107,7 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// ListResponse&lt;Status&gt; を使用して新しいステータスを現在のタイムラインに追加します。
         /// </summary>
-        /// <param name="response">追加するステータスの ListResponse。</param>
+        /// <param name="response">追加するステータスの ListedResponse。</param>
         public void NewStatusRange(ListedResponse<Status> response)
         {
             JsFront.Statuses.AddRange(response.OrderBy(s => s.Id));
@@ -136,7 +136,7 @@ namespace StoneTank.Yukiusagi
         /// <summary>
         /// 複数の ListedResponse&lt;Status&gt; を使用して新しいステータスを現在のタイムラインに追加します。
         /// </summary>
-        /// <param name="responses">追加するステータスの ListResponse。</param>
+        /// <param name="responses">追加するステータスの ListedResponse。</param>
         public void NewStatusRangeFromMultipleLists(ListedResponse<Status>[] responses)
         {
             List<Status> statuses = new List<Status>();
