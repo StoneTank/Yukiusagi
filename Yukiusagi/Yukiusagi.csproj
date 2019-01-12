@@ -184,13 +184,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HTML\jquery-3.2.1.min.js">
+    <Content Include="Html\jquery-3.2.1.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="HTML\moment-timezone.js">
+    <Content Include="Html\moment-timezone.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="HTML\moment.min.js">
+    <Content Include="Html\moment.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Fav.png">
@@ -222,7 +222,7 @@
     <None Include="Resources\Splash.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HTML\Timeline.html">
+    <Content Include="Html\Timeline.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Reply.png">
