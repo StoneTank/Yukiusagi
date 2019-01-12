@@ -87,8 +87,25 @@
       function addStatusRange(json) {
         var callback = function() {
           var html = "";
+          var statuses = JSON.parse(json);
 
-          $.each(JSON.parse(json), function(index, value) {
+          // ID 文字列によりソートします
+          statuses.sort(function(a, b) {
+            var a_id = ("000000000000000000" + a.id_str).slice(-19);
+            var b_id = ("000000000000000000" + b.id_str).slice(-19);
+            
+            if (a_id < b_id) {
+              return -1;
+            }
+            else if (a_id > b_id) {
+              return 1;
+            }
+            else {
+              return 0;
+            }
+          });
+
+          $.each(statuses, function(index, value) {
             html = getElement(value).outerHTML + html;
           });
 
@@ -103,7 +120,40 @@
        * @param {string} json 追加する Status の Array の Array の JSON
        */
       function addStatusRangeFromMultipleObjects(json) {
-        // 未実装
+        var callback = function() {
+          var html = "";
+          var statuses = {};
+          var obj = JSON.parse(json);
+
+          // obj の中にある Status の Array をすべて結合します
+          $.each(obj, function(index, value) {
+            $.extend(statuses, value);
+          });
+
+          // ID 文字列によりソートします
+          statuses.sort(function(a, b) {
+            var a_id = ("000000000000000000" + a.id_str).slice(-19);
+            var b_id = ("000000000000000000" + b.id_str).slice(-19);
+            
+            if (a_id < b_id) {
+              return -1;
+            }
+            else if (a_id > b_id) {
+              return 1;
+            }
+            else {
+              return 0;
+            }
+          });
+
+          $.each(statuses, function(index, value) {
+            html = getElement(value).outerHTML + html;
+          });
+
+          $("ul").prepend(html);
+        };
+        
+        setTimeout(callback, 0);
       }
 
       /**
@@ -144,7 +194,8 @@
           callback = function() {
             window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/Fav.png');");
           }
-        } else {
+        }
+        else {
           // fav
           callback = function() {
             window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/FavActive.png');");
@@ -217,7 +268,8 @@
           // 名前 @screen_name (Retweeted by @screen_name)
           userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.retweeted_status.user.id_str + ');"\>' + status.retweeted_status.user.name + ' @' + status.retweeted_status.user.screen_name +
           '\</a\> (Retweeted by \<a href="#" onclick="window.external.ShowUser(' + status.user.id_str + ');"\>@' + status.user.screen_name + '\</a\>)';
-        } else {
+        }
+        else {
           // 名前 @screen_name
           userHtml = '\<a href="#" onclick="window.external.ShowUser(' + status.user.id_str + ');"\>' + status.user.name + ' @' + status.user.screen_name + '\</a\>';
         }
