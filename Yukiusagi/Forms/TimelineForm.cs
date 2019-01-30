@@ -1,10 +1,12 @@
 ﻿using CoreTweet;
+using CoreTweet.Core;
 using StoneTank.Yukiusagi.Properties;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -89,37 +91,77 @@ namespace StoneTank.Yukiusagi
         }
 
         /// <summary>
-        /// ステータスを追加して表示します
+        /// StatusResponse を使用して新しいステータスを現在のタイムラインに追加します。
         /// </summary>
-        /// <param name="status">追加するステータス</param>
-        public async void NewStatus(Status status)
+        /// <param name="response">追加するステータスの StatusResponse。</param>
+        public void NewStatus(StatusResponse response)
         {
-            JsFront.Statuses.Add(status);
-
-            // JavaScript に投げる JSON
-            string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(new JsStatus(status)));
+            JsFront.Statuses.Add(response);
 
             if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
-                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusFunctionName"] as string, new object[] { json });
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusFunctionName"] as string, new object[] { response.Json });
             }
         }
 
         /// <summary>
-        /// 複数のステータスを追加して表示します
+        /// ListResponse&lt;Status&gt; を使用して新しいステータスを現在のタイムラインに追加します。
         /// </summary>
-        /// <param name="statuses">追加するステータス</param>
-        public async void NewStatusRange(List<Status> statuses)
+        /// <param name="response">追加するステータスの ListedResponse。</param>
+        public void NewStatusRange(ListedResponse<Status> response)
         {
-            JsFront.Statuses.AddRange(statuses);
+            JsFront.Statuses.AddRange(response.OrderBy(s => s.Id));
 
-            // JavaScript に投げる JSON
-            List<JsStatus> list = statuses.Select(status => new JsStatus(status)).ToList();
-            string json = await Task.Run(() => Newtonsoft.Json.JsonConvert.SerializeObject(list));
+            if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
+            {
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusRangeFunctionName"] as string, new object[] { response.Json });
+            }
+        }
+
+        /// <summary>
+        /// IEnumerable&lt;Status&gt; およびそれらを表す JSON を使用して新しいステータスを現在のタイムラインに追加します。
+        /// </summary>
+        /// <param name="statuses">追加するステータスの IEnumerable。</param>
+        /// <param name="json">追加する複数のステータスの JSON。</param>
+        public void NewStatusRange(IEnumerable<Status> statuses, string json)
+        {
+            JsFront.Statuses.AddRange(statuses.OrderBy(s => s.Id));
 
             if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
             {
                 webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusRangeFunctionName"] as string, new object[] { json });
+            }
+        }
+
+        /// <summary>
+        /// 複数の ListedResponse&lt;Status&gt; を使用して新しいステータスを現在のタイムラインに追加します。
+        /// </summary>
+        /// <param name="responses">追加するステータスの ListedResponse。</param>
+        public void NewStatusRangeFromMultipleLists(ListedResponse<Status>[] responses)
+        {
+            List<Status> statuses = new List<Status>();
+            StringBuilder json = new StringBuilder();
+
+            json.Append("[");
+
+            for (int i = 0; i < responses.Length; i++)
+            {
+                statuses.AddRange(responses[i]);
+                json.Append(responses[i].Json);
+
+                if (i < responses.Length - 1)
+                {
+                    json.Append(",");
+                }
+            }
+
+            json.Append("]");
+
+            JsFront.Statuses.AddRange(statuses.OrderBy(s => s.Id));
+
+            if (webBrowser.ReadyState == WebBrowserReadyState.Complete)
+            {
+                webBrowser.Document.InvokeScript(ConfigurationManager.AppSettings["AddStatusRangeFromMultipleListsFunctionName"] as string, new object[] { json });
             }
         }
 

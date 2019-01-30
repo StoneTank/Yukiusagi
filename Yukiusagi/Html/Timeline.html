@@ -67,9 +67,11 @@
       }
       // String.prototype.codePointAt ここまで
 
-      // ひとつのステータスを追加します
-      function addStatus(json)
-      {
+      /**
+       * ひとつのステータスを追加します
+       * @param {string} json 追加する Status の JSON
+       */
+      function addStatus(json) {
         var callback = function() {
           var status = JSON.parse(json);
           $("ul").prepend(getElement(status));
@@ -78,13 +80,32 @@
         setTimeout(callback, 0);
       }
 
-      // 複数のステータスを追加します
-      function addStatusRange(json)
-      {
+      /**
+       * 複数のステータスを追加します
+       * @param {string} json 追加する Status の Array の JSON
+       */
+      function addStatusRange(json) {
         var callback = function() {
           var html = "";
+          var statuses = JSON.parse(json);
 
-          $.each(JSON.parse(json), function(index, value) {
+          // ID 文字列によりソートします
+          statuses.sort(function(a, b) {
+            var a_id = ("000000000000000000" + a.id_str).slice(-19);
+            var b_id = ("000000000000000000" + b.id_str).slice(-19);
+            
+            if (a_id < b_id) {
+              return -1;
+            }
+            else if (a_id > b_id) {
+              return 1;
+            }
+            else {
+              return 0;
+            }
+          });
+
+          $.each(statuses, function(index, value) {
             html = getElement(value).outerHTML + html;
           });
 
@@ -94,9 +115,52 @@
         setTimeout(callback, 0);
       }
 
-      // 指定されたIDのステータスを表示から削除します
-      function removeStatus(id)
-      {
+      /**
+       * Status の Array の Array をもとに複数のステータスを追加します
+       * @param {string} json 追加する Status の Array の Array の JSON
+       */
+      function addStatusRangeFromMultipleObjects(json) {
+        var callback = function() {
+          var html = "";
+          var statuses = {};
+          var obj = JSON.parse(json);
+
+          // obj の中にある Status の Array をすべて結合します
+          $.each(obj, function(index, value) {
+            $.extend(statuses, value);
+          });
+
+          // ID 文字列によりソートします
+          statuses.sort(function(a, b) {
+            var a_id = ("000000000000000000" + a.id_str).slice(-19);
+            var b_id = ("000000000000000000" + b.id_str).slice(-19);
+            
+            if (a_id < b_id) {
+              return -1;
+            }
+            else if (a_id > b_id) {
+              return 1;
+            }
+            else {
+              return 0;
+            }
+          });
+
+          $.each(statuses, function(index, value) {
+            html = getElement(value).outerHTML + html;
+          });
+
+          $("ul").prepend(html);
+        };
+        
+        setTimeout(callback, 0);
+      }
+
+      /**
+       * 指定されたIDのステータスを表示から削除します
+       * @param {string} id 削除するステータスの ID 文字列
+       */
+      function removeStatus(id) {
         var callback = function() {
           $("#" + id).remove();
         };
@@ -104,9 +168,11 @@
         setTimeout(callback, 0);
       }
 
-      // 指定されたIDのステータスを削除するよう要求します
-      function destroy(id)
-      {
+      /**
+       * 指定されたIDのステータスを削除するよう要求します
+       * @param {string} id 削除を要求するステータスの ID 文字列
+       */
+      function destroy(id) {
         var callback = function() {
           window.external.Destroy(id, "");
         }
@@ -114,22 +180,22 @@
         setTimeout(callback, 0);
       }
 
-      // 指定されたIDのステータスを Favorite するよう要求します
-      function favorite(id)
-      {
+      /**
+       * 指定されたIDのステータスを Favorite するよう要求します
+       * @param {string} id Favorite を要求するステータスの ID 文字列
+       */
+      function favorite(id) {
         $("#" + id + " .favButton").attr('src', '../Resources/Loading.gif');
 
         var callback;
 
-        if (window.external.IsFavorited(id))
-        {
+        if (window.external.IsFavorited(id)) {
           // unfav
           callback = function() {
             window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/Fav.png');");
           }
         }
-        else
-        {
+        else {
           // fav
           callback = function() {
             window.external.Favorite(id, "$('#" + id + " .favButton').attr('src', '../Resources/FavActive.png');");
@@ -139,13 +205,14 @@
         setTimeout(callback, 0);
       }
 
-      // 指定されたIDのステータスをリツイートするよう要求します
-      function retweet(id)
-      {
-        $("#" + id + " .rtButton").attr('src', '../Resources/Loading.gif');
+      /**
+       * 指定されたIDのステータスをリツイートするよう要求します
+       * @param {string} id リツイートを要求するステータスの ID 文字列
+       */
+      function retweet(id) {
+        if (!window.external.IsRetweeted) {
+          $("#" + id + " .rtButton").attr('src', '../Resources/Loading.gif');
 
-        if (!window.external.IsRetweeted)
-        {
           var callback = function() {
             window.external.Retweet(id, "$('#" + id + " .rtButton').attr('src', '../Resources/RtActive.png');");
           };
@@ -154,8 +221,11 @@
         }
       }
 
-      function steal(id)
-      {
+      /**
+       * 指定されたIDのステータスを Steal するよう要求します
+       * @param {string} id Steal を要求するステータスの ID 文字列
+       */
+      function steal(id) {
         $("#" + id + " .stealButton").attr('src', '../Resources/Loading.gif');
 
         var callback = function() {
@@ -165,9 +235,11 @@
         setTimeout(callback, 0);
       }
 
-      // 指定された status オブジェクトからタイムライン表示用 Element を生成して返します
-      function getElement(status)
-      {
+      /**
+       * Status オブジェクトからタイムライン表示用の HTML 要素を生成して返します。
+       * @param status 
+       */
+      function getElement(status) {
         var element = document.createElement("li");
         
         // ステータス ID
@@ -223,11 +295,9 @@
         var detailHtml = (displayStatus.full_text != null ? displayStatus.full_text : displayStatus.text).replace(/\n/g, "\<br\>");
 
         // 本文: Entities
-        if (displayStatus.entities != null)
-        {
+        if (displayStatus.entities != null) {
           // 本文: Entities: ハッシュタグ
-          if (displayStatus.entities.hashtags != null)
-          {
+          if (displayStatus.entities.hashtags != null) {
             // タグの文字数により降順ソート
             displayStatus.entities.hashtags.sort(function(a, b) { return b.text.length - a.text.length; });
 
@@ -238,24 +308,21 @@
           }
 
           // 本文: Entities: メディア
-          if (displayStatus.entities.media != null)
-          {
+          if (displayStatus.entities.media != null) {
             $.each(displayStatus.entities.media, function(index, value) {
               detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
             });
           }
 
           // 本文: Entities: リンク
-          if (displayStatus.entities.urls != null)
-          {
+          if (displayStatus.entities.urls != null) {
             $.each(displayStatus.entities.urls, function(index, value) {
               detailHtml = detailHtml.replace(new RegExp(value.url, 'g'), '\<a href="' + value.url + '" title="' + value.expanded_url + '"\>' + value.display_url + '\</a\>');
             });
           }
 
           // 本文: Entities: Mentions
-          if (displayStatus.entities.user_mentions != null)
-          {
+          if (displayStatus.entities.user_mentions != null) {
             $.each(displayStatus.entities.user_mentions, function(index, value) {
               detailHtml = detailHtml.replace(new RegExp('(@' + value.screen_name + ')', 'g'), '\<a href="#" title="' + value.name + ' $1" onclick="window.external.ShowUser(\'' + value.id + '\');"\>$1\</a\>');
             });
@@ -266,21 +333,17 @@
         var mediaHtml = "";
 
         if (displayStatus.extended_entities != null &&
-          displayStatus.extended_entities.media != null)
-        {
+          displayStatus.extended_entities.media != null) {
           $.each(displayStatus.extended_entities.media, function(index, value) {
 
-            if (value.type == "photo")
-            {
+            if (value.type === "photo") {
               mediaHtml += '\<a href="' + value.media_url_https + '"\>\<img src="' + value.media_url_https + '"\>\</a\>';
             }
-            else if (value.type == "video" || value.type == "animated_gif")
-            {
+            else if (value.type === "video" || value.type === "animated_gif") {
               mediaHtml += '\<video controls poster="' + value.media_url_https + '"\>';
 
               $.each(value.variants, function(i, v) {
-                if (v.content_type == "video/mp4")
-                {
+                if (v.content_type === "video/mp4") {
                   mediaHtml += '\<source src="' + v.url + '" type="' + v.content_type + '"\>';
                 }
               });
@@ -305,15 +368,16 @@
         return element;
       }
 
-      // パラメータの文字列に対応する数値文字参照を返します。
-      function getCharacterReferences(str)
-      {
+      /**
+       * 文字列に対応する数値文字参照を返します。
+       * @param {string} str 数値文字参照を求めるもとの文字列
+       */
+      function getCharacterReferences(str) {
         var result = "";
         var position = 0;
         var codePoint = 0;
 
-        while (position < str.length)
-        {
+        while (position < str.length) {
           codePoint = str.codePointAt(position);
           result += "&#" + codePoint + ";";
           position += codePoint < 0x10000 ? 1 : 2;
